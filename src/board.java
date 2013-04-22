@@ -19,6 +19,18 @@ public class board {
 		}
 	}
 	
+	public void move(Move myMove) {
+		char figure = field[myMove.from.row][myMove.from.col];
+		field[myMove.from.row][myMove.from.col]='.';
+		field[myMove.to.row][myMove.to.col]=figure;
+		moveNum++;
+		if (onMove=='B') {
+			onMove='W';
+		} else {
+			onMove='B';
+		}
+	}
+	
 	public String toString() {
 		String print_out=""+moveNum+" "+onMove+" ";
 		for (int i=6; i>=1; i--) {
@@ -44,6 +56,7 @@ public class board {
 
 		board myBoard=new board("1 B kqbnrppp.....pp.....PPPPPRNBQK");
 		myBoard.print();
-		System.out.println(myBoard);
+		myBoard.move(new Move("b6 c5"));
+		myBoard.print();
 	}
 }
