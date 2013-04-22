@@ -1,30 +1,9 @@
 
 public class board {
-	char[][]field={{'.','.','.','.','.','.'},{'.','.','.','.','.','.'},{'.','.','.','.','.','.'},{'.','.','.','.','.','.'},{'.','.','.','.','.','.'}};
+	char[][]field={{'R','N','B','Q','K'},{'P','P','P','P','P'},{'.','.','.','.','.'},{'.','.','.','.','.'},{'p','p','p','p','p'},{'k','q','b','n','r'}};
 	int moveNum=1;
 	char onMove='B';
 	public board() {
-		for(int i=0;i<4;i++) {
-			field[i][1]='P';
-			field[i][4]='p';
-			switch (i) {
-			case 0:	field[i][0]='R';
-					field[i][5]='k';
-					break;
-			case 1:	field[i][0]='N';
-					field[i][5]='q';
-					break;
-			case 2:	field[i][0]='B';
-					field[i][5]='b';
-					break;
-			case 3:	field[i][0]='Q';
-					field[i][5]='n';
-					break;
-			case 4:	field[i][0]='K';
-					field[i][5]='r';
-					break;
-			}
-		}
 	}
 	
 	public String toString() {
@@ -35,7 +14,8 @@ public class board {
 
 	public void print() {
 		String print_out="";
-		for (int i=0; i<4; i++) {
+		for (int i=5; i>=0; i--) {
+			print_out="";
 			for (int j=0; j<5; j++) {
 				print_out=print_out+field[i][j];
 			}
