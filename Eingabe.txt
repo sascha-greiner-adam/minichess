@@ -1,0 +1,20 @@
+1.
+
+c1 c2
+
+1 B
+kqbnr
+ppp..
+...pp
+.....
+PPPPP
+RNBQK
+2 W
+kqbnr
+ppp..
+...pp
+.....
+PPBPP
+RN.QK
+
+===========

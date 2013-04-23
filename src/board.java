@@ -1,6 +1,5 @@
 import java.util.ArrayList;
-
-
+import java.io.*;
 
 public class board {
 	char[][]field={{' ',' ',' ',' ',' ',' '},{' ','R','N','B','Q','K'},{' ','P','P','P','P','P'},{' ','.','.','.','.','.'},{' ','.','.','.','.','.'},{' ','p','p','p','p','p'},{' ','k','q','b','n','r'}};
@@ -108,13 +107,28 @@ public class board {
 		System.out.println();
 	}
 
-//Main method
-	public static void main(String[] args) {
-
-		board myBoard=new board("1 B kqbnrppp......p....pPPPPPRNBQK");
-		myBoard.print();
-		myBoard.move(new Move("b6 c5"));
-		myBoard.print();
-		ArrayList<Move> bla = myBoard.legalMoves();
+	public static void main(String[] args){
+		
+		BufferedReader bin = new BufferedReader(
+                new InputStreamReader(System.in));
+		String eingabe = "null";
+		try{
+			while(eingabe != "exit" ){
+			
+			    eingabe = bin.readLine();
+			
+				board myBoard=new board("1 B kqbnrppp.....pp.....PPPPPRNBQK");
+				myBoard.print();
+				myBoard.move(new Move(eingabe));
+				myBoard.print();
+				ArrayList<Move> bla = myBoard.legalMoves();
+			}
+		}catch(NullPointerException e){
+			System.out.println("False Input given: " + e.getMessage());
+		}catch(IOException f){
+			f.getMessage();
+		}catch(ArrayIndexOutOfBoundsException f){
+			System.out.println("False Input given: Please type a correct Move in the Terminal");
+		}
 	}
 }
