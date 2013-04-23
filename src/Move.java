@@ -11,6 +11,11 @@ public class Move {
 		this.to = new Square(splitResult[1]);
 	}
 	
+	public Move(Square from_sq, Square to_sq){
+		this.from = from_sq;
+		this.to = to_sq;
+	}
+	
 	public String toString() {
 		return from + "-" + to;
 	}

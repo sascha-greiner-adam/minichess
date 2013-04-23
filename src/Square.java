@@ -18,7 +18,7 @@ public class Square{
 		}
 		
 		public String toString(){
-			return "" + (char)(col + (int)'a') + (int)(row);
+			return "" + (char)(col + (int)'a' - 1) + (int)(row);
 		}
 		
 		public static void main(String[] args){
