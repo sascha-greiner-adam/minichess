@@ -53,19 +53,27 @@ public class board {
 			System.out.println(print_out);
 		}
 	}
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args){
 		
 		BufferedReader bin = new BufferedReader(
                 new InputStreamReader(System.in));
 		String eingabe = "null";
-		while(eingabe != "x" ){
-		
-		    eingabe = bin.readLine();
-		
-			board myBoard=new board("1 B kqbnrppp.....pp.....PPPPPRNBQK");
-			myBoard.print();
-			myBoard.move(new Move(eingabe));
-			myBoard.print();
+		try{
+			while(eingabe != "exit" ){
+			
+			    eingabe = bin.readLine();
+			
+				board myBoard=new board("1 B kqbnrppp.....pp.....PPPPPRNBQK");
+				myBoard.print();
+				myBoard.move(new Move(eingabe));
+				myBoard.print();
+			}
+		}catch(NullPointerException e){
+			System.out.println("False Input given: " + e.getMessage());
+		}catch(IOException f){
+			f.getMessage();
+		}catch(ArrayIndexOutOfBoundsException f){
+			System.out.println("False Input given: Please type a correct Move in the Terminal");
 		}
 	}
 }
