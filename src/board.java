@@ -5,6 +5,8 @@ public class board {
 	char[][]field={{' ',' ',' ',' ',' ',' '},{' ','R','N','B','Q','K'},{' ','P','P','P','P','P'},{' ','.','.','.','.','.'},{' ','.','.','.','.','.'},{' ','p','p','p','p','p'},{' ','k','q','b','n','r'}};
 	int moveNum=1;
 	char onMove='B';
+	static int countK = 0; 
+	static int countk = 0;
 	
 //Constructors	
 	public board() {
@@ -23,14 +25,42 @@ public class board {
 
 //Moves a figure without check
 	public void move(Move myMove) {
+		 
+
 		char figure = field[myMove.from.row][myMove.from.col];
 		field[myMove.from.row][myMove.from.col]='.';
 		field[myMove.to.row][myMove.to.col]=figure;
+		
+		//If pawn is on the "pawn - row" at the opponent side and moves to the last line he promotes 
+		//to a queen
+		if(field[6][myMove.to.col] == 'P')
+			field[6][myMove.to.col] = 'Q';
+		if(field[1][myMove.to.col] == 'p')
+			field[1][myMove.to.col] = 'q';
+		
+		for(int i = 1; i <= 6; i++){
+			for(int j = 1; j <= 5; j++){
+				
+				if(field[i][j] == 'K')
+					countK++;
+				if(field[i][j] == 'k')
+					countk++;
+			}
+		}
+		
+		
 		moveNum++;
 		if (onMove=='B') {
 			onMove='W';
 		} else {
 			onMove='B';
+		}
+	}
+	
+	public void check_game(int K, int k){
+		if(K == 0 || k == 0 || moveNum > 40){
+			System.out.println("Das Spiel ist vorbei");
+			System.exit(0);
 		}
 	}
 
@@ -117,10 +147,11 @@ public class board {
 			
 			    eingabe = bin.readLine();
 			
-				board myBoard=new board("1 B kqbnrppp.....pp.....PPPPPRNBQK");
+				board myBoard=new board("1 B kqbnrpPp.....pp.....PpPPPRNBQK");
 				myBoard.print();
 				myBoard.move(new Move(eingabe));
 				myBoard.print();
+				myBoard.check_game(countk, countK);
 				ArrayList<Move> bla = myBoard.legalMoves();
 			}
 		}catch(NullPointerException e){

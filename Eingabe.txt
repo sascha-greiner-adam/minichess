@@ -9,7 +9,9 @@ ppp..
 .....
 PPPPP
 RNBQK
+
 2 W
+
 kqbnr
 ppp..
 ...pp
@@ -18,3 +20,84 @@ PPBPP
 RN.QK
 
 ===========
+2. 
+
+c2 c3
+
+1 B
+kqbnr
+ppp..
+...pp
+.....
+PPPPP
+RNBQK
+
+2 W
+
+kqbnr
+ppp..
+...pp
+..P..
+PP.PP
+RNBQK
+
+==========
+3.
+
+d1 e2
+
+1 B
+kqbnr
+ppp..
+...pp
+.....
+PPPPP
+RNBQK
+
+2 W
+
+kqbnr
+ppp..
+...pp
+.....
+PPPPQ
+RNB.K
+
+b2 b1
+
+1 B
+
+kqbnr
+pPp..
+...pp
+.....
+PpPPP
+RNBQK
+
+2 W
+
+kqbnr
+pPp..
+...pp
+.....
+P.PPP
+RqBQK
+
+=========
+
+1 B
+
+kqbnr
+pPp..
+...pp
+.....
+PpPPP
+RNBQK
+
+2 W
+kQbnr
+p.p..
+...pp
+.....
+PpPPP
+RNBQK
