@@ -25,8 +25,8 @@ public class board {
 
 //Moves a figure without check
 	public char move(Move myMove) {
-		 
-
+		int countWhite=0;
+		int countBlack=0;
 		char figure = field[myMove.from.row][myMove.from.col];
 		field[myMove.from.row][myMove.from.col]='.';
 		field[myMove.to.row][myMove.to.col]=figure;
@@ -40,15 +40,12 @@ public class board {
 		
 		for(int i = 1; i <= 6; i++){
 			for(int j = 1; j <= 5; j++){
-				
 				if(field[i][j] == 'K')
 					countWhite++;
 				if(field[i][j] == 'k')
 					countBlack++;
 			}
 		}
-		
-
 		
 		moveNum++;
 		if (onMove=='B') {
@@ -63,13 +60,12 @@ public class board {
 		else if(countWhite == 0){
 			return 'B';
 		}
-		else if(moveNum > 40){
+		else if(moveNum >= 40){
 			return 'R';
 		}
 		else
 			return '?';
 	}
-	
 
 
 	public ArrayList<Move> legalMoves() {
@@ -231,28 +227,27 @@ public class board {
 		System.out.println();
 	}
 
+public char dumb_random() {
+	ArrayList<Move> movelist = legalMoves();
+	double rnd = Math.random();
+	int rnd_int = (int)(rnd*movelist.size());
+	Move act_move = movelist.get(rnd_int);
+	return move(act_move);
+}
+
 	public static void main(String[] args){
 		char move_result;
 		BufferedReader bin = new BufferedReader(
                 new InputStreamReader(System.in));
-		String eingabe = "null";
+		String eingabe;
 		board myBoard=new board();
 		myBoard.print();
-		ArrayList<Move> movelist = myBoard.legalMoves();
-	       for (Move m : movelist)  // for() loop over list
-	    	   System.out.println(m);
+
 		try{
 			do{
 				eingabe = bin.readLine();
-				double rnd = Math.random();
-				int rnd_int = (int)(rnd*movelist.size());
-				Move act_move = movelist.get(rnd_int);
-				System.out.println("Move: "+act_move+" Rnd: "+rnd_int);
-				move_result = myBoard.move(act_move);
+				move_result = myBoard.dumb_random();
 				myBoard.print();
-				movelist = myBoard.legalMoves();
-			    for (Move m : movelist)  // for() loop over list
-			       System.out.println(m);
 			}
 			while(move_result == '?');
 		}catch(NullPointerException e){
