@@ -1,3 +1,4 @@
+import java.io.*;
 
 
 public class board {
@@ -52,11 +53,19 @@ public class board {
 			System.out.println(print_out);
 		}
 	}
-	public static void main(String[] args) {
-
-		board myBoard=new board("1 B kqbnrppp.....pp.....PPPPPRNBQK");
-		myBoard.print();
-		myBoard.move(new Move("b6 c5"));
-		myBoard.print();
+	public static void main(String[] args) throws IOException {
+		
+		BufferedReader bin = new BufferedReader(
+                new InputStreamReader(System.in));
+		String eingabe = "null";
+		while(eingabe != "x" ){
+		
+		    eingabe = bin.readLine();
+		
+			board myBoard=new board("1 B kqbnrppp.....pp.....PPPPPRNBQK");
+			myBoard.print();
+			myBoard.move(new Move(eingabe));
+			myBoard.print();
+		}
 	}
 }
