@@ -5,8 +5,8 @@ public class board {
 	char[][]field={{' ',' ',' ',' ',' ',' '},{' ','R','N','B','Q','K'},{' ','P','P','P','P','P'},{' ','.','.','.','.','.'},{' ','.','.','.','.','.'},{' ','p','p','p','p','p'},{' ','k','q','b','n','r'}};
 	int moveNum=1;
 	char onMove='B';
-	static int countK = 0; 
-	static int countk = 0;
+	static int countWhite = 0; 
+	static int countBlack = 0;
 	
 //Constructors	
 	public board() {
@@ -24,7 +24,7 @@ public class board {
 	}
 
 //Moves a figure without check
-	public void move(Move myMove) {
+	public char move(Move myMove) {
 		 
 
 		char figure = field[myMove.from.row][myMove.from.col];
@@ -42,12 +42,13 @@ public class board {
 			for(int j = 1; j <= 5; j++){
 				
 				if(field[i][j] == 'K')
-					countK++;
+					countWhite++;
 				if(field[i][j] == 'k')
-					countk++;
+					countBlack++;
 			}
 		}
 		
+
 		
 		moveNum++;
 		if (onMove=='B') {
@@ -55,14 +56,21 @@ public class board {
 		} else {
 			onMove='B';
 		}
+		
+		if(countBlack == 0){
+			return 'W';
+		}
+		else if(countWhite == 0){
+			return 'B';
+		}
+		else if(moveNum > 40){
+			return 'R';
+		}
+		else
+			return '?';
 	}
 	
-	public void check_game(int K, int k){
-		if(K == 0 || k == 0 || moveNum > 40){
-			System.out.println("Das Spiel ist vorbei");
-			System.exit(0);
-		}
-	}
+
 
 	public ArrayList<Move> legalMoves() {
 	       ArrayList<Move> moves = new ArrayList<Move>();
@@ -234,7 +242,12 @@ public class board {
 	       for (Move m : movelist)  // for() loop over list
 	    	   System.out.println(m);
 		try{
+<<<<<<< HEAD
 			while(eingabe != "exit" ){
+=======
+			do{
+				
+>>>>>>> 8752e1a03d546d54d198373404f5bbe3c6b6a37a
 				eingabe = bin.readLine();
 				double rnd = Math.random();
 				int rnd_int = (int)(rnd*movelist.size());
@@ -242,12 +255,18 @@ public class board {
 				System.out.println("Move: "+act_move+" Rnd: "+rnd_int);
 				myBoard.move(act_move);
 				myBoard.print();
+<<<<<<< HEAD
 			    //myBoard.check_game(countk, countK);
 				
 				movelist = myBoard.legalMoves();
 			    for (Move m : movelist)  // for() loop over list
+=======
+				bla = myBoard.legalMoves();
+			    for (Move m : bla)  // for() loop over list
+>>>>>>> 8752e1a03d546d54d198373404f5bbe3c6b6a37a
 			       System.out.println(m);
 			}
+			while(myBoard.move(new Move(eingabe)) == '?');
 		}catch(NullPointerException e){
 			System.out.println("False Input given: " + e.getMessage());
 		}catch(IOException f){

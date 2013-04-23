@@ -9,7 +9,7 @@ public class Move {
 	//Constructor for creating an Move object. You have to
 	//insert a string like "c1 c2"
 	public Move(String fields){	
-			String[] splitResult = fields.split(" ");
+			String[] splitResult = fields.split("-");
 			this.from = new Square(splitResult[0]);
 			this.to = new Square(splitResult[1]);
 	}
