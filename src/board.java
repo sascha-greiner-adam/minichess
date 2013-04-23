@@ -232,7 +232,7 @@ public class board {
 	}
 
 	public static void main(String[] args){
-		
+		char move_result;
 		BufferedReader bin = new BufferedReader(
                 new InputStreamReader(System.in));
 		String eingabe = "null";
@@ -242,31 +242,19 @@ public class board {
 	       for (Move m : movelist)  // for() loop over list
 	    	   System.out.println(m);
 		try{
-<<<<<<< HEAD
-			while(eingabe != "exit" ){
-=======
 			do{
-				
->>>>>>> 8752e1a03d546d54d198373404f5bbe3c6b6a37a
 				eingabe = bin.readLine();
 				double rnd = Math.random();
 				int rnd_int = (int)(rnd*movelist.size());
 				Move act_move = movelist.get(rnd_int);
 				System.out.println("Move: "+act_move+" Rnd: "+rnd_int);
-				myBoard.move(act_move);
+				move_result = myBoard.move(act_move);
 				myBoard.print();
-<<<<<<< HEAD
-			    //myBoard.check_game(countk, countK);
-				
 				movelist = myBoard.legalMoves();
 			    for (Move m : movelist)  // for() loop over list
-=======
-				bla = myBoard.legalMoves();
-			    for (Move m : bla)  // for() loop over list
->>>>>>> 8752e1a03d546d54d198373404f5bbe3c6b6a37a
 			       System.out.println(m);
 			}
-			while(myBoard.move(new Move(eingabe)) == '?');
+			while(move_result == '?');
 		}catch(NullPointerException e){
 			System.out.println("False Input given: " + e.getMessage());
 		}catch(IOException f){
