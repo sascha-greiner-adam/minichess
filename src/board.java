@@ -23,10 +23,67 @@ public class board {
 		}
 	}
 
+	//Calculate the current score for the active player and returns it
+	public int getScore(){
+		
+		int scoreWhite = 0;
+		int scoreBlack = 0;
+		
+		for(int i = 1; i <= 6; i++){
+			for(int j = 1; j <= 5; j++){
+				
+				switch(field[i][j]){
+					case 'K': 	countWhite++;
+								scoreWhite += 10000;
+								break;
+								
+					case 'Q': 	scoreWhite += 100;
+								break;
+		
+					case 'B': 	scoreWhite += 30;
+								break;
+								
+					case 'N': 	scoreWhite += 30;
+								break;
+								
+					case 'R': 	scoreWhite += 50;
+								break;
+		
+					case 'P': 	scoreWhite += 10;
+								break;
+		
+					case 'k':	countBlack++;
+								scoreBlack += 10000;
+								break;
+								
+					case 'q':	scoreBlack += 100;
+								break;
+	
+					case 'b':	scoreBlack += 30;
+								break;
+								
+					case 'n':	scoreBlack += 30;
+								break;
+								
+					case 'r':	scoreBlack += 50;
+								break;
+								
+					case 'p':	scoreBlack += 10;
+								break;
+								
+					default:	break;
+				}
+			}
+		}
+		if(onMove == 'B')
+			return scoreBlack - scoreWhite;
+		else
+			return scoreWhite - scoreBlack;
+	}
+	
 //Moves a figure without check
 	public char move(Move myMove) {
 		 
-
 		char figure = field[myMove.from.row][myMove.from.col];
 		field[myMove.from.row][myMove.from.col]='.';
 		field[myMove.to.row][myMove.to.col]=figure;
@@ -37,19 +94,7 @@ public class board {
 			field[6][myMove.to.col] = 'Q';
 		if(field[1][myMove.to.col] == 'p')
 			field[1][myMove.to.col] = 'q';
-		
-		for(int i = 1; i <= 6; i++){
-			for(int j = 1; j <= 5; j++){
-				
-				if(field[i][j] == 'K')
-					countWhite++;
-				if(field[i][j] == 'k')
-					countBlack++;
-			}
-		}
-		
-
-		
+			
 		moveNum++;
 		if (onMove=='B') {
 			onMove='W';
@@ -232,7 +277,7 @@ public class board {
 	}
 
 	public static void main(String[] args){
-		
+		char move_result;
 		BufferedReader bin = new BufferedReader(
                 new InputStreamReader(System.in));
 		String eingabe = "null";
@@ -242,31 +287,20 @@ public class board {
 	       for (Move m : movelist)  // for() loop over list
 	    	   System.out.println(m);
 		try{
-<<<<<<< HEAD
-			while(eingabe != "exit" ){
-=======
 			do{
-				
->>>>>>> 8752e1a03d546d54d198373404f5bbe3c6b6a37a
 				eingabe = bin.readLine();
 				double rnd = Math.random();
 				int rnd_int = (int)(rnd*movelist.size());
 				Move act_move = movelist.get(rnd_int);
 				System.out.println("Move: "+act_move+" Rnd: "+rnd_int);
-				myBoard.move(act_move);
+				System.out.println("Current Score: " + myBoard.getScore());
+				move_result = myBoard.move(act_move);
 				myBoard.print();
-<<<<<<< HEAD
-			    //myBoard.check_game(countk, countK);
-				
 				movelist = myBoard.legalMoves();
 			    for (Move m : movelist)  // for() loop over list
-=======
-				bla = myBoard.legalMoves();
-			    for (Move m : bla)  // for() loop over list
->>>>>>> 8752e1a03d546d54d198373404f5bbe3c6b6a37a
 			       System.out.println(m);
 			}
-			while(myBoard.move(new Move(eingabe)) == '?');
+			while(move_result == '?');
 		}catch(NullPointerException e){
 			System.out.println("False Input given: " + e.getMessage());
 		}catch(IOException f){
