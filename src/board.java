@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.io.*;
 
 public class board {
 	char[][]field={{' ',' ',' ',' ',' ',' '},{' ','R','N','B','Q','K'},{' ','P','P','P','P','P'},{' ','.','.','.','.','.'},{' ','.','.','.','.','.'},{' ','p','p','p','p','p'},{' ','k','q','b','n','r'}};
@@ -255,7 +254,7 @@ public class board {
 				moves.add(new Move(start, new Square(temp_col,temp_row)));
 				break;
 			}
-			if (captureMode == 0 && captureMode != 2 && field[temp_row][temp_col]=='.') moves.add(new Move(start, new Square(temp_col,temp_row)));
+			if (captureMode <= 1 && field[temp_row][temp_col]=='.') moves.add(new Move(start, new Square(temp_col,temp_row)));
 			temp_row+=dr;
 			temp_col+=dc;
 			cnt++;
@@ -293,9 +292,8 @@ public class board {
 	ArrayList<Move> movelist = legalMoves();
 	double rnd = Math.random();
 	int rnd_int = (int)(rnd*movelist.size());
-	for (Move m: movelist) System.out.println(m);
 	if (movelist.isEmpty()) {
-		System.out.println("Movelist leer!");
+		System.out.println("Dumb Movelist leer!");
 		return '=';
 	} else {
 		Move act_move = movelist.get(rnd_int);
@@ -322,9 +320,8 @@ public class board {
 		}
 		double rnd = Math.random();
 		int rnd_int = (int)(rnd*exec_movelist.size());
-		for (Move m: exec_movelist) System.out.println(m);
 		if (movelist.isEmpty()) {
-			System.out.println("Movelist leer!");
+			System.out.println("Halfdumb Movelist leer!");
 			return '=';
 		} else {
 			Move act_move = exec_movelist.get(rnd_int);
@@ -334,15 +331,11 @@ public class board {
 	}
 	
 	public static void main(String[] args){
-		/*char move_result;
-		BufferedReader bin = new BufferedReader(
-                new InputStreamReader(System.in));
-		String eingabe;
+		char move_result;
+		
 		board myBoard=new board();
 		myBoard.print();
-		//for (int k=0; k<20; k++) {
 			do{
-				//eingabe = bin.readLine();
 				move_result = myBoard.dumb_random();
 				myBoard.print();
 				System.out.println("Current Score: " + myBoard.getScore());
@@ -351,17 +344,12 @@ public class board {
 				System.out.println("Current Score: " + myBoard.getScore());
 			}
 			while(move_result == '?');
+			myBoard.print();
 			switch (move_result) {
 			case 'B': System.out.println("Black wins");
 			break;
 			case 'W': System.out.println("White wins");
 			break;
-			default: break;
-			}
-		//}*/
-		board myBoard2 = new board("12 W .......kq.....................");
-		myBoard2.print();
-		ArrayList<Move> movelist = myBoard2.legalMoves();
-		for (Move m:movelist) System.out.println(m);
+		}
 	}
 }
