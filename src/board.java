@@ -82,6 +82,7 @@ public class board {
 	}
 	
 //Moves a figure without check
+
 	public char move(Move myMove) {
 
 		int countWhite=0;
@@ -232,6 +233,7 @@ public class board {
 	    		   }
 	    	   }
 	       }
+	       if (moves.isEmpty()) System.out.println("---ACHTUNG--- Movelist leer!!!");
 	       return moves;
 	}
 
@@ -287,36 +289,79 @@ public class board {
 		System.out.println();
 	}
 
-public char dumb_random() {
+	public char dumb_random() {
 	ArrayList<Move> movelist = legalMoves();
 	double rnd = Math.random();
 	int rnd_int = (int)(rnd*movelist.size());
-	Move act_move = movelist.get(rnd_int);
-	return move(act_move);
+	for (Move m: movelist) System.out.println(m);
+	if (movelist.isEmpty()) {
+		System.out.println("Movelist leer!");
+		return '=';
+	} else {
+		Move act_move = movelist.get(rnd_int);
+		return move(act_move);
+	}
 }
 
+	public char half_dumb_random() {
+		int score=10000;
+		board copy = new board(this.toString());
+		ArrayList<Move> movelist = copy.legalMoves();
+		ArrayList<Move> exec_movelist = new ArrayList<Move>();
+		for (Move m : movelist) {
+			copy = new board(this.toString());
+			copy.move(m);
+			if (copy.getScore() < score) score=copy.getScore();
+		}
+		for (Move m : movelist) {
+			copy = new board(this.toString());
+			copy.move(m);
+			if (copy.getScore() <= score) {
+				exec_movelist.add(m);
+			}
+		}
+		double rnd = Math.random();
+		int rnd_int = (int)(rnd*exec_movelist.size());
+		for (Move m: exec_movelist) System.out.println(m);
+		if (movelist.isEmpty()) {
+			System.out.println("Movelist leer!");
+			return '=';
+		} else {
+			Move act_move = exec_movelist.get(rnd_int);
+			return move(act_move);
+		}
+		
+	}
+	
 	public static void main(String[] args){
-		char move_result;
+		/*char move_result;
 		BufferedReader bin = new BufferedReader(
                 new InputStreamReader(System.in));
 		String eingabe;
 		board myBoard=new board();
 		myBoard.print();
-
-		try{
+		//for (int k=0; k<20; k++) {
 			do{
-				eingabe = bin.readLine();
+				//eingabe = bin.readLine();
 				move_result = myBoard.dumb_random();
+				myBoard.print();
+				System.out.println("Current Score: " + myBoard.getScore());
+				move_result = myBoard.half_dumb_random();
 				myBoard.print();
 				System.out.println("Current Score: " + myBoard.getScore());
 			}
 			while(move_result == '?');
-		}catch(NullPointerException e){
-			System.out.println("False Input given: " + e.getMessage());
-		}catch(IOException f){
-			f.getMessage();
-		}catch(ArrayIndexOutOfBoundsException f){
-			System.out.println("False Input given: Please type a correct Move in the Terminal");
-		}
+			switch (move_result) {
+			case 'B': System.out.println("Black wins");
+			break;
+			case 'W': System.out.println("White wins");
+			break;
+			default: break;
+			}
+		//}*/
+		board myBoard2 = new board("12 W .......kq.....................");
+		myBoard2.print();
+		ArrayList<Move> movelist = myBoard2.legalMoves();
+		for (Move m:movelist) System.out.println(m);
 	}
 }
