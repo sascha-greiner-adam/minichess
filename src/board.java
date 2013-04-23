@@ -230,20 +230,23 @@ public class board {
 		String eingabe = "null";
 		board myBoard=new board();
 		myBoard.print();
-		ArrayList<Move> bla = myBoard.legalMoves();
-	       for (Move m : bla)  // for() loop over list
+		ArrayList<Move> movelist = myBoard.legalMoves();
+	       for (Move m : movelist)  // for() loop over list
 	    	   System.out.println(m);
 		try{
 			while(eingabe != "exit" ){
-				
 				eingabe = bin.readLine();
-				myBoard.move(new Move(eingabe));
+				double rnd = Math.random();
+				int rnd_int = (int)(rnd*movelist.size());
+				Move act_move = movelist.get(rnd_int);
+				System.out.println("Move: "+act_move+" Rnd: "+rnd_int);
+				myBoard.move(act_move);
 				myBoard.print();
-			    myBoard.check_game(countk, countK);
-				bla = myBoard.legalMoves();
-			    for (Move m : bla)  // for() loop over list
+			    //myBoard.check_game(countk, countK);
+				
+				movelist = myBoard.legalMoves();
+			    for (Move m : movelist)  // for() loop over list
 			       System.out.println(m);
-
 			}
 		}catch(NullPointerException e){
 			System.out.println("False Input given: " + e.getMessage());
