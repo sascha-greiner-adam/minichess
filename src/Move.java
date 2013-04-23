@@ -3,10 +3,21 @@
 
 
 public class Move {
-	
-	public Move(String field){
-		
+	Square from;;
+	Square to;
+	public Move(String fields){
+		String[] splitResult = fields.split(" ");
+		this.from = new Square(splitResult[0]);
+		this.to = new Square(splitResult[1]);
 	}
 	
+	public String toString() {
+		return from + "-" + to;
+	}
+	
+	public static void main(String[] args) {
+		Move myMove = new Move("c4 c5");
+		System.out.println(myMove);
+	}
 }
 
