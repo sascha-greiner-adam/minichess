@@ -4,7 +4,7 @@ import java.io.*;
 public class board {
 	char[][]field={{' ',' ',' ',' ',' ',' '},{' ','R','N','B','Q','K'},{' ','P','P','P','P','P'},{' ','.','.','.','.','.'},{' ','.','.','.','.','.'},{' ','p','p','p','p','p'},{' ','k','q','b','n','r'}};
 	int moveNum=1;
-	char onMove='B';
+	char onMove='W';
 	
 //Constructors	
 	public board() {
@@ -38,17 +38,106 @@ public class board {
 	       ArrayList<Move> moves = new ArrayList<Move>();
 	       for (int i=1; i<=6; i++) {
 	    	   for (int j=1; j<=5; j++) {
-	    		   switch (field[i][j]) {
-		    		   case 'P':	addscan(moves, new Square(j,i),1,0,true,0);
-		    		   				addscan(moves, new Square(j,i),1,1,true,2);
-		    		   				addscan(moves, new Square(j,i),1,-1,true,2);
-		    		   break;
+	    		   if (onMove=='W') {
+	    			   switch (field[i][j]) {
+			    		   case 'P':	addscan(moves, new Square(j,i),1,0,true,0);
+			    		   				addscan(moves, new Square(j,i),1,1,true,2);
+			    		   				addscan(moves, new Square(j,i),1,-1,true,2);
+			    		   				break;
+			    		   case 'R':	addscan(moves, new Square(j,i),1,0,false,1);
+										addscan(moves, new Square(j,i),-1,1,false,1);
+										addscan(moves, new Square(j,i),0,1,false,1);
+										addscan(moves, new Square(j,i),0,-1,false,1);
+										break;
+			    		   case 'N':	addscan(moves, new Square(j,i),1,2,true,1);
+										addscan(moves, new Square(j,i),2,1,true,1);
+										addscan(moves, new Square(j,i),-1,2,true,1);
+										addscan(moves, new Square(j,i),-2,1,true,1);
+										addscan(moves, new Square(j,i),1,-2,true,1);
+										addscan(moves, new Square(j,i),2,-1,true,1);
+										addscan(moves, new Square(j,i),-1,-2,true,1);
+										addscan(moves, new Square(j,i),-2,-1,true,1);
+										break;
+			    		   case 'B':	addscan(moves, new Square(j,i),1,1,false,1);
+										addscan(moves, new Square(j,i),1,-1,false,1);
+										addscan(moves, new Square(j,i),-1,1,false,1);
+										addscan(moves, new Square(j,i),-1,-1,false,1);
+										addscan(moves, new Square(j,i),1,0,true,0);
+										addscan(moves, new Square(j,i),0,1,true,0);
+										addscan(moves, new Square(j,i),-1,0,true,0);
+										addscan(moves, new Square(j,i),0,-1,true,0);
+										break;
+			    		   case 'Q':	addscan(moves, new Square(j,i),1,1,false,1);
+										addscan(moves, new Square(j,i),1,-1,false,1);
+										addscan(moves, new Square(j,i),-1,1,false,1);
+										addscan(moves, new Square(j,i),-1,-1,false,1);
+										addscan(moves, new Square(j,i),1,0,false,1);
+										addscan(moves, new Square(j,i),0,1,false,1);
+										addscan(moves, new Square(j,i),-1,0,false,1);
+										addscan(moves, new Square(j,i),0,-1,false,1);
+										break;
+			    		   case 'K':	addscan(moves, new Square(j,i),1,1,true,1);
+										addscan(moves, new Square(j,i),1,-1,true,1);
+										addscan(moves, new Square(j,i),-1,1,true,1);
+										addscan(moves, new Square(j,i),-1,-1,true,1);
+										addscan(moves, new Square(j,i),1,0,true,1);
+										addscan(moves, new Square(j,i),0,1,true,1);
+										addscan(moves, new Square(j,i),-1,0,true,1);
+										addscan(moves, new Square(j,i),0,-1,true,1);
+										break;
+	    		   		}
+	    		   }
+	    		   if (onMove=='B') {
+	    			   	switch (field[i][j]) {
+						   case 'p':	addscan(moves, new Square(j,i),-1,0,true,0);
+										addscan(moves, new Square(j,i),-1,1,true,2);
+										addscan(moves, new Square(j,i),-1,-1,true,2);
+							   			break;
+						   case 'r':	addscan(moves, new Square(j,i),1,0,false,1);
+										addscan(moves, new Square(j,i),-1,1,false,1);
+										addscan(moves, new Square(j,i),0,1,false,1);
+										addscan(moves, new Square(j,i),0,-1,false,1);
+										break;
+						   case 'n':	addscan(moves, new Square(j,i),1,2,true,1);
+										addscan(moves, new Square(j,i),2,1,true,1);
+										addscan(moves, new Square(j,i),-1,2,true,1);
+										addscan(moves, new Square(j,i),-2,1,true,1);
+										addscan(moves, new Square(j,i),1,-2,true,1);
+										addscan(moves, new Square(j,i),2,-1,true,1);
+										addscan(moves, new Square(j,i),-1,-2,true,1);
+										addscan(moves, new Square(j,i),-2,-1,true,1);
+										break;
+						   case 'b':	addscan(moves, new Square(j,i),1,1,false,1);
+										addscan(moves, new Square(j,i),1,-1,false,1);
+										addscan(moves, new Square(j,i),-1,1,false,1);
+										addscan(moves, new Square(j,i),-1,-1,false,1);
+										addscan(moves, new Square(j,i),1,0,true,0);
+										addscan(moves, new Square(j,i),0,1,true,0);
+										addscan(moves, new Square(j,i),-1,0,true,0);
+										addscan(moves, new Square(j,i),0,-1,true,0);
+										break;
+						   case 'q':	addscan(moves, new Square(j,i),1,1,false,1);
+										addscan(moves, new Square(j,i),1,-1,false,1);
+										addscan(moves, new Square(j,i),-1,1,false,1);
+										addscan(moves, new Square(j,i),-1,-1,false,1);
+										addscan(moves, new Square(j,i),1,0,false,1);
+										addscan(moves, new Square(j,i),0,1,false,1);
+										addscan(moves, new Square(j,i),-1,0,false,1);
+										addscan(moves, new Square(j,i),0,-1,false,1);
+										break;
+						   case 'k':	addscan(moves, new Square(j,i),1,1,true,1);
+										addscan(moves, new Square(j,i),1,-1,true,1);
+										addscan(moves, new Square(j,i),-1,1,true,1);
+										addscan(moves, new Square(j,i),-1,-1,true,1);
+										addscan(moves, new Square(j,i),1,0,true,1);
+										addscan(moves, new Square(j,i),0,1,true,1);
+										addscan(moves, new Square(j,i),-1,0,true,1);
+										addscan(moves, new Square(j,i),0,-1,true,1);
+										break;
+	    			   	}
 	    		   }
 	    	   }
 	       }
-	       //addscan(moves, new Square("c2"),1,0,false,1);
-	       for (Move m : moves)  // for() loop over list
-	    	   System.out.println(m);
 	       return moves;
 	}
 
@@ -58,12 +147,9 @@ public class board {
 		int temp_row=start.row+dr;
 		int temp_col=start.col+dc;
 		int cnt=0;
-		if (onMove=='W') {
-			
-		}
 		
 		//check if move is on the board yet and if there is any figure on the target
-		while ((temp_row <= 6) && (temp_row >= 1) && (temp_col <= 5) && (temp_col >= 1) && ((oneStep && cnt < 1) || (!oneStep)) && ((onMove=='W' && !(field[temp_row][temp_col] >= 'A' && field[temp_row][temp_col]<'Z')) || (onMove=='B' && field[temp_row][temp_col] >= 'a' && !(field[temp_row][temp_col]<'z')))) { 
+		while ((temp_row <= 6) && (temp_row >= 1) && (temp_col <= 5) && (temp_col >= 1) && ((oneStep && cnt < 1) || (!oneStep)) && ((onMove=='W' && !(field[temp_row][temp_col] >= 'A' && field[temp_row][temp_col]<'Z')) || (onMove=='B' && !(field[temp_row][temp_col] >= 'a' && field[temp_row][temp_col]<'z')))) { 
 			//check if there is any capture activity
 			if (captureMode > 0 && (onMove=='W' && field[temp_row][temp_col]>='a' && field[temp_row][temp_col]<='z')) {
 				moves.add(new Move(start, new Square(temp_col,temp_row)));
@@ -73,7 +159,7 @@ public class board {
 				moves.add(new Move(start, new Square(temp_col,temp_row)));
 				break;
 			}
-			if (captureMode != 2) moves.add(new Move(start, new Square(temp_col,temp_row)));
+			if (captureMode == 0 && captureMode != 2 && field[temp_row][temp_col]=='.') moves.add(new Move(start, new Square(temp_col,temp_row)));
 			temp_row+=dr;
 			temp_col+=dc;
 			cnt++;
@@ -112,16 +198,19 @@ public class board {
 		BufferedReader bin = new BufferedReader(
                 new InputStreamReader(System.in));
 		String eingabe = "null";
+		board myBoard=new board();
+		myBoard.print();
+		ArrayList<Move> bla = myBoard.legalMoves();
+	       for (Move m : bla)  // for() loop over list
+	    	   System.out.println(m);
 		try{
 			while(eingabe != "exit" ){
-			
-			    eingabe = bin.readLine();
-			
-				board myBoard=new board("1 B kqbnrppp.....pp.....PPPPPRNBQK");
-				myBoard.print();
+				eingabe = bin.readLine();
 				myBoard.move(new Move(eingabe));
 				myBoard.print();
-				ArrayList<Move> bla = myBoard.legalMoves();
+				bla = myBoard.legalMoves();
+			       for (Move m : bla)  // for() loop over list
+			    	   System.out.println(m);
 			}
 		}catch(NullPointerException e){
 			System.out.println("False Input given: " + e.getMessage());
