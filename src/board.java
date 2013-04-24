@@ -2,6 +2,7 @@
 //telnet_login: user = ai_megachess_8000_ger passwort = minichess2013
 
 
+import java.io.*;
 import java.util.ArrayList;
 
 public class board {
@@ -398,30 +399,70 @@ public class board {
 		}
 	}
 
+	public char network_player() throws IOException {
+		int score=10000;
+		int negascore = 0;
+		board copy = new board(this.toString());
+		ArrayList<Move> movelist = copy.legalMoves();
+		ArrayList<Move> exec_movelist = new ArrayList<Move>();
+		for (Move m : movelist) {
+			copy = new board(this.toString());
+			copy.move(m);
+			negascore = negamax(copy,3);
+			if (negascore < score) score=negascore;
+		}
+		for (Move m : movelist) {
+			copy = new board(this.toString());
+			copy.move(m);
+			if (negamax(copy,3) <= score) {
+				exec_movelist.add(m);
+			}
+		}
+		double rnd = Math.random();
+		int rnd_int = (int)(rnd*exec_movelist.size());
+		if (movelist.isEmpty()) {
+			System.out.println("Negamax Movelist leer!");
+			return '=';
+		} else {
+			Move act_move = exec_movelist.get(rnd_int);
+			return move(act_move);
+		}
+	}
+	
 	public static void main(String[] args){
 		char move_result;
 		
-		board myBoard=new board();
-		myBoard.print();
-			do{
-				if (myBoard.onMove=='B') {
-					move_result = myBoard.nega_player();
-				} else {
-					move_result = myBoard.nega_player();
-				}
-				System.out.println("Current Score: " + myBoard.getScore()+ " MoveResult: "+move_result);
-				myBoard.print();
-				System.out.println();
-			} while(move_result == '?');
-			
+		try{
+			Client myClient = new Client("imcs.svcs.cs.pdx.edu", "3589", "ai_megachess_8000_ger", "minichess2013");
+			System.out.println(myClient);
+			myClient.offer('?');
+
+			board myBoard=new board();
 			myBoard.print();
+				do{
+					if (myBoard.onMove=='B') {
+						move_result = myBoard.network_player();
+					} else {
+						move_result = myBoard.nega_player();
+					}
+					System.out.println("Current Score: " + myBoard.getScore()+ " MoveResult: "+move_result);
+					myBoard.print();
+					System.out.println();
+				} while(move_result == '?');
+				
+				myBoard.print();
 			switch (move_result) {
-			case 'B': System.out.println("Black wins");
-			break;
-			case 'W': System.out.println("White wins");
-			break;
-			case 'R': System.out.println("Remis");
-			break;
+				case 'B': System.out.println("Black wins");
+				break;
+				case 'W': System.out.println("White wins");
+				break;
+				case 'R': System.out.println("Remis");
+				break;
+			}
+			myClient.close();
+		}
+		catch(IOException e){
+			e.getMessage();
 		}
 	}
 }
