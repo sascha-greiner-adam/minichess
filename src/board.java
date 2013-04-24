@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class board {
 	char[][]field={{' ',' ',' ',' ',' ',' '},{' ','R','N','B','Q','K'},{' ','P','P','P','P','P'},{' ','.','.','.','.','.'},{' ','.','.','.','.','.'},{' ','p','p','p','p','p'},{' ','k','q','b','n','r'}};
 	int moveNum=1;
-	char onMove='B';
+	char onMove='W';
 
 	
 //Constructors	
@@ -131,7 +131,6 @@ public class board {
 		int countWhite = 0; 
 		int countBlack = 0;
 
-		
 		for(int i = 1; i <= 6; i++){
 			for(int j = 1; j <= 5; j++){
 				if(field[i][j] == 'K')
@@ -299,7 +298,7 @@ public class board {
 //Prints out the actual chess board
 	public void print() {
 		String print_out="";
-		System.out.println(moveNum+" "+onMove);
+		System.out.println("Round: "+moveNum+" On Move: "+onMove);
 		for (int i=6; i>=1; i--) {
 			print_out="";
 			for (int j=1; j<=5; j++) {
@@ -312,7 +311,7 @@ public class board {
 
 	public int negamax(board b, int d) {
 		int score=-10000;
-		//if (!b.gameOver() || d==0) return b.getScore();
+		if (b.gameOver() != '?' || d == 0) return b.getScore();
 
 		ArrayList<Move> ml = b.legalMoves();
 		for (Move m : ml) {
@@ -337,6 +336,7 @@ public class board {
 }
 
 	public char half_dumb_random() {
+
 		int score=10000;
 		board copy = new board(this.toString());
 		ArrayList<Move> movelist = copy.legalMoves();
@@ -364,19 +364,50 @@ public class board {
 		}
 		
 	}
-	
+	public char nega_player() {
+		int score=10000;
+		int negascore = 0;
+		board copy = new board(this.toString());
+		ArrayList<Move> movelist = copy.legalMoves();
+		ArrayList<Move> exec_movelist = new ArrayList<Move>();
+		for (Move m : movelist) {
+			copy = new board(this.toString());
+			copy.move(m);
+			negascore = negamax(copy,3);
+			if (negascore < score) score=negascore;
+		}
+		for (Move m : movelist) {
+			copy = new board(this.toString());
+			copy.move(m);
+			if (negamax(copy,3) <= score) {
+				exec_movelist.add(m);
+			}
+		}
+		double rnd = Math.random();
+		int rnd_int = (int)(rnd*exec_movelist.size());
+		if (movelist.isEmpty()) {
+			System.out.println("Negamax Movelist leer!");
+			return '=';
+		} else {
+			Move act_move = exec_movelist.get(rnd_int);
+			return move(act_move);
+		}
+	}
+
 	public static void main(String[] args){
 		char move_result;
 		
 		board myBoard=new board();
 		myBoard.print();
 			do{
-				move_result = myBoard.dumb_random();
-				myBoard.print();
+				if (myBoard.onMove=='B') {
+					move_result = myBoard.nega_player();
+				} else {
+					move_result = myBoard.nega_player();
+				}
 				System.out.println("Current Score: " + myBoard.getScore()+ " MoveResult: "+move_result);
-				move_result = myBoard.half_dumb_random();
 				myBoard.print();
-				System.out.println("Current Score: " + myBoard.getScore()+ " MoveResult: "+move_result);
+				System.out.println();
 			} while(move_result == '?');
 			
 			myBoard.print();
@@ -384,6 +415,8 @@ public class board {
 			case 'B': System.out.println("Black wins");
 			break;
 			case 'W': System.out.println("White wins");
+			break;
+			case 'R': System.out.println("Remis");
 			break;
 		}
 	}
