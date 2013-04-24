@@ -288,6 +288,19 @@ public class board {
 		System.out.println();
 	}
 
+	public int negamax(board b, int d) {
+		int score=-10000;
+		if (!b.gameOver() || d==0) return b.getScore();
+
+		ArrayList<Move> ml = b.legalMoves();
+		for (Move m : ml) {
+			board b2=new board(b.toString());
+			b2.move(m);
+			score = Math.max(score, -negamax(b2,d-1));
+		}
+		return score;
+	}
+	
 	public char dumb_random() {
 	ArrayList<Move> movelist = legalMoves();
 	double rnd = Math.random();
