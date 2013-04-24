@@ -1,3 +1,7 @@
+//Copyright © 2013 Sascha Greiner-Adam, Matthias Karl
+//telnet_login: user = ai_megachess_8000_ger passwort = minichess2013
+
+
 import java.util.ArrayList;
 
 public class board {

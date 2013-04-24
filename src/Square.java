@@ -1,4 +1,4 @@
-//Copyright © 2013 Matthias Karl
+//Copyright © 2013 Sascha Greiner-Adam, Matthias Karl
 
 public class Square{
 		public int col = 0;
