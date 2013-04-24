@@ -444,7 +444,7 @@ public class board {
 		}
 	}
 
-	public char network_player() throws IOException {
+	public Move network_player() throws IOException {
 		int score=10000;
 		int negascore = 0;
 		board copy = new board(this.toString());
@@ -465,17 +465,12 @@ public class board {
 		}
 		double rnd = Math.random();
 		int rnd_int = (int)(rnd*exec_movelist.size());
-		if (movelist.isEmpty()) {
-			System.out.println("Negamax Movelist leer!");
-			return '=';
-		} else {
 			Move act_move = exec_movelist.get(rnd_int);
-			return move(act_move);
-		}
+			return act_move;
+		
 	}
 	
 	public static void main(String[] args){
-		char move_result;
 
 		long $startmilli = 0;
 		long $time_black = 0;
@@ -484,24 +479,26 @@ public class board {
 		try{
 			Client myClient = new Client("imcs.svcs.cs.pdx.edu", "3589", "ai_megachess_8000_ger", "minichess2013");
 			System.out.println(myClient);
-			myClient.offer('?');
-	
+			myClient.offer('B');
+			//myClient.accept("6252", 'B');
 			board myBoard=new board();		
-		
+			//System.out.println("Moveresult: "+move_result);
 			myBoard.print();
 				do{
 					$startmilli = System.currentTimeMillis();
 					if (myBoard.onMove=='B') {
-						move_result = myBoard.nega_player();
-						$time_black+=(System.currentTimeMillis()-$startmilli);
+						myClient.sendMove("! " + myBoard.network_player().toString());
+						//move_result = myBoard.network_player();
+						$time_black += (System.currentTimeMillis()-$startmilli);
 					} else {
-						move_result = myBoard.nega_player_quick();
+						//move_result = myBoard.network_player();
+						myBoard.move(new Move(myClient.getMove()));
 						$time_white+=(System.currentTimeMillis()-$startmilli);
 					}
-					System.out.println("Current Score: " + myBoard.getScore()+ " MoveResult: "+move_result+" Time: "+(System.currentTimeMillis()-$startmilli));
+					//System.out.println("Current Score: " + myBoard.getScore()+ " MoveResult: "+move_result+" Time: "+(System.currentTimeMillis()-$startmilli));
 					myBoard.print();
 					System.out.println();
-				} while(move_result == '?');
+				} while(myBoard.gameOver() == '?');
 
 				System.out.println("Black needs around "+($time_black/myBoard.moveNum)+" Millisconds per move");
 				System.out.println("White needs around "+($time_white/myBoard.moveNum)+" Millisconds per move");
