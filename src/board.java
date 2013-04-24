@@ -408,20 +408,6 @@ public class board {
 			System.out.println(m+" : "+v0);
 		}
 
-		/*for (Map.Entry<Move, Integer> entry : map.entrySet()) {
-		    if (entry.getValue() <= score) exec_movelist.add(entry.getKey());
-		}*/
-		
-		/*double rnd = Math.random();
-		int rnd_int = (int)(rnd*exec_movelist.size());
-		if (movelist.isEmpty()) {
-			System.out.println("Negamax Movelist leer!");
-			return '=';
-		} else {
-			Move act_move = exec_movelist.get(rnd_int);
-			System.out.println("Chosen move: "+act_move);
-			return move(act_move);
-		}*/
 		return move(m0);
 	}
 	
