@@ -355,8 +355,8 @@ public class board {
 				move_result = myBoard.half_dumb_random();
 				myBoard.print();
 				System.out.println("Current Score: " + myBoard.getScore());
-			}
-			while(move_result == '?');
+			} while(move_result == '?');
+			
 			myBoard.print();
 			switch (move_result) {
 			case 'B': System.out.println("Black wins");
