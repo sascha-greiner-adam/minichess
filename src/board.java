@@ -4,8 +4,7 @@ public class board {
 	char[][]field={{' ',' ',' ',' ',' ',' '},{' ','R','N','B','Q','K'},{' ','P','P','P','P','P'},{' ','.','.','.','.','.'},{' ','.','.','.','.','.'},{' ','p','p','p','p','p'},{' ','k','q','b','n','r'}};
 	int moveNum=1;
 	char onMove='B';
-	static int countWhite = 0; 
-	static int countBlack = 0;
+
 	
 //Constructors	
 	public board() {
@@ -32,7 +31,7 @@ public class board {
 			for(int j = 1; j <= 5; j++){
 				
 				switch(field[i][j]){
-					case 'K': 	countWhite++;
+					case 'K': 	//countWhite++;
 								scoreWhite += 10000;
 								break;
 								
@@ -51,7 +50,7 @@ public class board {
 					case 'P': 	scoreWhite += 10;
 								break;
 		
-					case 'k':	countBlack++;
+					case 'k':	//countBlack++;
 								scoreBlack += 10000;
 								break;
 								
@@ -84,8 +83,8 @@ public class board {
 
 	public char move(Move myMove) {
 
-		int countWhite=0;
-		int countBlack=0;
+		int countWhite = 0; 
+		int countBlack = 0;
 
 		char figure = field[myMove.from.row][myMove.from.col];
 		field[myMove.from.row][myMove.from.col]='.';
@@ -114,20 +113,43 @@ public class board {
 			onMove='B';
 		}
 		
-		if(countBlack == 0){
+		if(countBlack == 0)
 			return 'W';
-		}
-		else if(countWhite == 0){
+		
+		else if(countWhite == 0)
 			return 'B';
-		}
-		else if(moveNum >= 40){
+		
+		else if(moveNum >= 40)
 			return 'R';
-		}
+		
 		else
 			return '?';
 	}
 
+	public char gameOver(){
+		
+		int countWhite = 0; 
+		int countBlack = 0;
 
+		
+		for(int i = 1; i <= 6; i++){
+			for(int j = 1; j <= 5; j++){
+				if(field[i][j] == 'K')
+					countWhite++;
+				if(field[i][j] == 'k')
+					countBlack++;
+			}
+		}
+		
+		if(countBlack == 0) return 'W';
+		
+		if(countWhite == 0)	return 'B';
+		
+		if(moveNum >= 40) return 'R';
+		
+			return '?';
+	}
+		
 	public ArrayList<Move> legalMoves() {
 	       ArrayList<Move> moves = new ArrayList<Move>();
 	       for (int i=1; i<=6; i++) {
@@ -351,10 +373,10 @@ public class board {
 			do{
 				move_result = myBoard.dumb_random();
 				myBoard.print();
-				System.out.println("Current Score: " + myBoard.getScore());
+				System.out.println("Current Score: " + myBoard.getScore()+ "MoveResult: "+move_result);
 				move_result = myBoard.half_dumb_random();
 				myBoard.print();
-				System.out.println("Current Score: " + myBoard.getScore());
+				System.out.println("Current Score: " + myBoard.getScore()+ "MoveResult: "+move_result);
 			}
 			while(move_result == '?');
 			myBoard.print();
