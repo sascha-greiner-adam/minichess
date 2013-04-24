@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 
 public class board {
-	char[][]field={{' ',' ',' ',' ',' ',' '},{' ','R','N','B','Q','K'},{' ','P','P','P','P','P'},{' ','.','.','.','.','.'},{' ','.','.','.','.','.'},{' ','p','p','p','p','p'},{' ','k','q','b','n','r'}};
-	int moveNum=1;
-	char onMove='B';
+	char[][]field = {{' ',' ',' ',' ',' ',' '},{' ','R','N','B','Q','K'},{' ','P','P','P','P','P'},{' ','.','.','.','.','.'},{' ','.','.','.','.','.'},{' ','p','p','p','p','p'},{' ','k','q','b','n','r'}};
+	int moveNum = 1;
+	char onMove = 'B';
 	static int countWhite = 0; 
 	static int countBlack = 0;
 	
@@ -84,12 +84,10 @@ public class board {
 
 	public char move(Move myMove) {
 
-		int countWhite=0;
-		int countBlack=0;
 
 		char figure = field[myMove.from.row][myMove.from.col];
-		field[myMove.from.row][myMove.from.col]='.';
-		field[myMove.to.row][myMove.to.col]=figure;
+		field[myMove.from.row][myMove.from.col] = '.';
+		field[myMove.to.row][myMove.to.col] = figure;
 		
 		//If pawn is on the "pawn - row" at the opponent side and moves to the last line he promotes 
 		//to a queen
@@ -97,6 +95,17 @@ public class board {
 			field[6][myMove.to.col] = 'Q';
 		if(field[1][myMove.to.col] == 'p')
 			field[1][myMove.to.col] = 'q';
+		
+		moveNum++;
+		if (onMove=='B') 
+			onMove='W';
+		else
+			onMove='B';
+		
+		return gameOver();
+	}
+
+	public char gameOver(){
 		
 		for(int i = 1; i <= 6; i++){
 			for(int j = 1; j <= 5; j++){
@@ -106,14 +115,6 @@ public class board {
 					countBlack++;
 			}
 		}
-		
-		moveNum++;
-		if (onMove=='B') {
-			onMove='W';
-		} else {
-			onMove='B';
-		}
-		
 		if(countBlack == 0){
 			return 'W';
 		}
@@ -126,8 +127,7 @@ public class board {
 		else
 			return '?';
 	}
-
-
+	
 	public ArrayList<Move> legalMoves() {
 	       ArrayList<Move> moves = new ArrayList<Move>();
 	       for (int i=1; i<=6; i++) {
@@ -302,14 +302,15 @@ public class board {
 }
 
 	public char half_dumb_random() {
-		int score=10000;
+		int score = 10000;
 		board copy = new board(this.toString());
 		ArrayList<Move> movelist = copy.legalMoves();
 		ArrayList<Move> exec_movelist = new ArrayList<Move>();
 		for (Move m : movelist) {
 			copy = new board(this.toString());
 			copy.move(m);
-			if (copy.getScore() < score) score=copy.getScore();
+			if (copy.getScore() < score) 
+				score=copy.getScore();
 		}
 		for (Move m : movelist) {
 			copy = new board(this.toString());
