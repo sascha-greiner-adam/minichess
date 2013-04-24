@@ -1,11 +1,12 @@
-//Copyright © 2013 Sascha Greiner-Adam, Matthias Karl
-//telnet_login: user = ai_megachess_8000_ger passwort = minichess2013
+/*Copyright © 2013 Sascha Greiner-Adam, Matthias Karl
+/telnet_login: user = ai_megachess_8000_ger passwort = minichess2013
 
+*/
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.*;
 
 
 public class board {
@@ -104,7 +105,7 @@ public class board {
 			field[6][myMove.to.col] = 'Q';
 		if(field[1][myMove.to.col] == 'p')
 			field[1][myMove.to.col] = 'q';
-		
+		/*
 		for(int i = 1; i <= 6; i++){
 			for(int j = 1; j <= 5; j++){
 				if(field[i][j] == 'K')
@@ -112,15 +113,15 @@ public class board {
 				if(field[i][j] == 'k')
 					countBlack++;
 			}
-		}
+		}*/
 		
-		moveNum++;
 		if (onMove=='B') {
 			onMove='W';
+			moveNum++;
 		} else {
 			onMove='B';
 		}
-		
+		/*
 		if(countBlack == 0)
 			return 'W';
 		
@@ -132,8 +133,12 @@ public class board {
 		
 		else
 			return '?';
+		*/
+		return gameOver();
 	}
-
+	
+	//Checks the game progress and returns W = white wins, B = black wins, 
+	//R = remis, ? = game in progress
 	public char gameOver(){
 		
 		int countWhite = 0; 
@@ -152,11 +157,12 @@ public class board {
 		
 		if(countWhite == 0)	return 'B';
 		
-		if(moveNum >= 40) return 'R';
+		if(moveNum >= 41) return 'R';
 		
 			return '?';
 	}
-		
+	
+	//generate all legal moves and store and return them in/as an ArrayList<Move>
 	public ArrayList<Move> legalMoves() {
 	       ArrayList<Move> moves = new ArrayList<Move>();
 	       for (int i=1; i<=6; i++) {
@@ -317,6 +323,7 @@ public class board {
 		System.out.println();
 	}
 
+	//Execute the negamax algorithm and return the score as an integer
 	public int negamax(board b, int d) {
 		int score=-10000;
 		if (b.gameOver() != '?' || d == 0) return b.getScore();
@@ -330,6 +337,7 @@ public class board {
 		return score;
 	}
 	
+	//Execute the negamax algorithm with the alpha beta prune and return the score as an integer
 	public int negamax_prune(board b, int d, int alpha, int beta) {
 		int score=-10000;
 		if (b.gameOver() != '?' || d == 0) return b.getScore();
@@ -345,6 +353,7 @@ public class board {
 		return score;
 	}
 	
+	//thats the dumbest player 
 	public char dumb_random() {
 	ArrayList<Move> movelist = legalMoves();
 	double rnd = Math.random();
@@ -357,7 +366,8 @@ public class board {
 		return move(act_move);
 	}
 }
-
+	
+	//he is the greedy dump player who takes always the nextbest move
 	public char half_dumb_random() {
 
 		int score=10000;
@@ -388,7 +398,8 @@ public class board {
 		
 	}
 	
-	public char nega_prune_player() {
+	//he is the genius player and uses the negamax_prune algorithm and returns a Move object
+	public Move nega_prune_player() {
 		//Map<Move, Integer> map = new HashMap<Move, Integer>();
 		Move m0=null;
 		int v=-10000;
@@ -400,7 +411,7 @@ public class board {
 		for (Move m : movelist) {
 			copy = new board(this.toString());
 			copy.move(m);
-			v0 = Math.max(v,-negamax_prune(copy,3,-10000,-alpha));
+			v0 = Math.max(v,-negamax_prune(copy,5,-10000,-alpha));
 			alpha = Math.max(alpha, v0);
 			//map.put(m, v0);
 			if (v0 > v) m0 = m;
@@ -408,9 +419,10 @@ public class board {
 			System.out.println(m+" : "+v0);
 		}
 
-		return move(m0);
+		return m0;
 	}
 	
+	//he is the quick player who uses the negamax algorithm
 	public char nega_player_quick() {
 		Map<Move, Integer> map = new HashMap<Move, Integer>();
 		
@@ -443,7 +455,8 @@ public class board {
 		}
 	}
 	
-	public char nega_player() {
+	//the nega_player with only the negamax algorithm without any improvements
+	public Move nega_player() {
 		
 		int score=10000;
 		int negascore = 0;
@@ -467,16 +480,12 @@ public class board {
 
 		double rnd = Math.random();
 		int rnd_int = (int)(rnd*exec_movelist.size());
-		if (movelist.isEmpty()) {
-			System.out.println("Negamax Movelist leer!");
-			return '=';
-		} else {
+
 			Move act_move = exec_movelist.get(rnd_int);
-			return move(act_move);
-		}
+			return act_move;
 	}
 
-	public Move network_player() throws IOException {
+	public Move network_player(){
 		int score=10000;
 		int negascore = 0;
 		board copy = new board(this.toString());
@@ -502,36 +511,60 @@ public class board {
 		
 	}
 	
+	//main method - start of the programm
 	public static void main(String[] args){
-
+			
+		Move move_result;
+		
+		String id = null;
 		long $startmilli = 0;
 		long $time_black = 0;
 		long $time_white = 0;
-		
+				
 		try{
 			Client myClient = new Client("imcs.svcs.cs.pdx.edu", "3589", "ai_megachess_8000_ger", "minichess2013");
 			System.out.println(myClient);
+			
+			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-			myClient.offer('B');
-			//myClient.accept("6252", 'B');
+			System.out.println("Create new game? [Y/N]");
+			String offers = in.readLine();
+			
+			char[] trigger = offers.toCharArray();
+			
+			System.out.println("Which color?");
+			char color = (char)in.read();
 
+			
+			if(trigger[0] == 'Y')
+				myClient.offer(color);
+			else{
+				System.out.println("Which game do you want to join?");
+				in = new BufferedReader(new InputStreamReader(System.in));
+				id = in.readLine();				
+			}
+			
+			color = myClient.accept(id, color);
+			
 			board myBoard=new board();		
 			//System.out.println("Moveresult: "+move_result);
 			myBoard.print();
+			System.out.println(color);
 				do{
 					$startmilli = System.currentTimeMillis();
-					if (myBoard.onMove=='B') {
-
-						myClient.sendMove("! " + myBoard.network_player().toString());
-						//move_result = myBoard.network_player();
+					if (myBoard.onMove == color) {
+						move_result = myBoard.nega_player();
+						myBoard.move(move_result);
+						myClient.sendMove("! " + move_result.toString());
+						
 						$time_black += (System.currentTimeMillis()-$startmilli);
-
 					} else {
 						//move_result = myBoard.network_player();
 						myBoard.move(new Move(myClient.getMove()));
 						$time_white+=(System.currentTimeMillis()-$startmilli);
 					}
 					//System.out.println("Current Score: " + myBoard.getScore()+ " MoveResult: "+move_result+" Time: "+(System.currentTimeMillis()-$startmilli));
+					System.out.println("=============");
 					myBoard.print();
 					System.out.println();
 
@@ -539,7 +572,7 @@ public class board {
 
 				if (myBoard.gameOver()=='B') System.out.println("Black wins");
 				if (myBoard.gameOver()=='W') System.out.println("White wins");
-				if (myBoard.gameOver()=='=') System.out.println("Remis");
+				if (myBoard.gameOver()=='R') System.out.println("Remis");
 
 				System.out.println("Black needs around "+($time_black/myBoard.moveNum)+" Millisconds per move");
 				System.out.println("White needs around "+($time_white/myBoard.moveNum)+" Millisconds per move");
