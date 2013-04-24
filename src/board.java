@@ -330,6 +330,21 @@ public class board {
 		return score;
 	}
 	
+	public int negamax_prune(board b, int d, int alpha, int beta) {
+		int score=-10000;
+		if (b.gameOver() != '?' || d == 0) return b.getScore();
+		ArrayList<Move> ml = b.legalMoves();
+		
+		for (Move m : ml) {
+			board b2=new board(b.toString());
+			b2.move(m);
+			score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha));
+			alpha = Math.max(alpha, score);
+			if (score >= beta) return score;
+		}
+		return score;
+	}
+	
 	public char dumb_random() {
 	ArrayList<Move> movelist = legalMoves();
 	double rnd = Math.random();
@@ -372,6 +387,44 @@ public class board {
 		}
 		
 	}
+	
+	public char nega_prune_player() {
+		//Map<Move, Integer> map = new HashMap<Move, Integer>();
+		Move m0=null;
+		int v=-10000;
+		int v0 = 0;
+		int alpha=-10000;
+		
+		board copy = new board(this.toString());
+		ArrayList<Move> movelist = copy.legalMoves();
+		for (Move m : movelist) {
+			copy = new board(this.toString());
+			copy.move(m);
+			v0 = Math.max(v,-negamax_prune(copy,3,-10000,-alpha));
+			alpha = Math.max(alpha, v0);
+			//map.put(m, v0);
+			if (v0 > v) m0 = m;
+			v = Math.max(v, v0);
+			System.out.println(m+" : "+v0);
+		}
+
+		/*for (Map.Entry<Move, Integer> entry : map.entrySet()) {
+		    if (entry.getValue() <= score) exec_movelist.add(entry.getKey());
+		}*/
+		
+		/*double rnd = Math.random();
+		int rnd_int = (int)(rnd*exec_movelist.size());
+		if (movelist.isEmpty()) {
+			System.out.println("Negamax Movelist leer!");
+			return '=';
+		} else {
+			Move act_move = exec_movelist.get(rnd_int);
+			System.out.println("Chosen move: "+act_move);
+			return move(act_move);
+		}*/
+		return move(m0);
+	}
+	
 	public char nega_player_quick() {
 		Map<Move, Integer> map = new HashMap<Move, Integer>();
 		
@@ -388,13 +441,6 @@ public class board {
 			if (negascore < score) score=negascore;
 			map.put(m, negascore);
 		}
-		/*for (Move m : movelist) {
-			copy = new board(this.toString());
-			copy.move(m);
-			if (negamax(copy,3) <= score) {
-				exec_movelist.add(m);
-			}
-		}*/
 
 		for (Map.Entry<Move, Integer> entry : map.entrySet()) {
 		    if (entry.getValue() <= score) exec_movelist.add(entry.getKey());
@@ -484,7 +530,7 @@ public class board {
 		try{
 			Client myClient = new Client("imcs.svcs.cs.pdx.edu", "3589", "ai_megachess_8000_ger", "minichess2013");
 			System.out.println(myClient);
-			myClient.offer('?');
+			//myClient.offer('?');
 	
 			board myBoard=new board();		
 		
@@ -492,7 +538,7 @@ public class board {
 				do{
 					$startmilli = System.currentTimeMillis();
 					if (myBoard.onMove=='B') {
-						move_result = myBoard.nega_player();
+						move_result = myBoard.nega_prune_player();
 						$time_black+=(System.currentTimeMillis()-$startmilli);
 					} else {
 						move_result = myBoard.nega_player_quick();
@@ -502,7 +548,9 @@ public class board {
 					myBoard.print();
 					System.out.println();
 				} while(move_result == '?');
-
+				if (myBoard.gameOver()=='B') System.out.println("Black wins");
+				if (myBoard.gameOver()=='W') System.out.println("White wins");
+				if (myBoard.gameOver()=='=') System.out.println("Remis");
 				System.out.println("Black needs around "+($time_black/myBoard.moveNum)+" Millisconds per move");
 				System.out.println("White needs around "+($time_white/myBoard.moveNum)+" Millisconds per move");
 
