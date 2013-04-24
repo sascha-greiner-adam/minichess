@@ -82,50 +82,51 @@ public class board {
 	
 //Moves a figure without check
 
-	public char move(Move myMove) {
+	   public char move(Move myMove) {
+		
+		    
+		        char figure = field[myMove.from.row][myMove.from.col];
 
-		int countWhite=0;
-		int countBlack=0;
-
-		char figure = field[myMove.from.row][myMove.from.col];
-		field[myMove.from.row][myMove.from.col]='.';
-		field[myMove.to.row][myMove.to.col]=figure;
-		
-		//If pawn is on the "pawn - row" at the opponent side and moves to the last line he promotes 
-		//to a queen
-		if(field[6][myMove.to.col] == 'P')
-			field[6][myMove.to.col] = 'Q';
-		if(field[1][myMove.to.col] == 'p')
-			field[1][myMove.to.col] = 'q';
-		
-		for(int i = 1; i <= 6; i++){
-			for(int j = 1; j <= 5; j++){
-				if(field[i][j] == 'K')
-					countWhite++;
-				if(field[i][j] == 'k')
-					countBlack++;
-			}
-		}
-		
-		moveNum++;
-		if (onMove=='B') {
-			onMove='W';
-		} else {
-			onMove='B';
-		}
-		
-		if(countBlack == 0){
-			return 'W';
-		}
-		else if(countWhite == 0){
-			return 'B';
-		}
-		else if(moveNum >= 40){
-			return 'R';
-		}
-		else
-			return '?';
-	}
+		       field[myMove.from.row][myMove.from.col] = '.';
+		       field[myMove.to.row][myMove.to.col] = figure;
+		        
+		        //If pawn is on the "pawn - row" at the opponent side and moves to the last line he promotes 
+		        //to a queen
+		   
+		        if(field[1][myMove.to.col] == 'p')
+		          field[1][myMove.to.col] = 'q';
+		        
+		       moveNum++;
+		       if (onMove=='B') 
+		         onMove='W';
+		       else
+		         onMove='B';
+		       
+		       return gameOver();
+		     }
+		   
+		     public char gameOver(){
+		       
+		        for(int i = 1; i <= 6; i++){
+		          for(int j = 1; j <= 5; j++){
+		            if(field[i][j] == 'k')
+		              countBlack++;
+		            if(field[i][j] == 'K')
+			              countWhite++;
+			            
+		          }
+		        }
+  
+		        if(countBlack == 0)
+		          return 'W';
+		        
+		        else if(countWhite == 0)
+		        	return 'B';
+		        else if(moveNum >= 40)
+		        	return '=';
+		        else
+		          return '?';
+		      }
 
 
 	public ArrayList<Move> legalMoves() {
@@ -290,7 +291,7 @@ public class board {
 
 	public int negamax(board b, int d) {
 		int score=-10000;
-		if (!b.gameOver() || d==0) return b.getScore();
+		if (b.gameOver() != '?' || d==0) return b.getScore();
 
 		ArrayList<Move> ml = b.legalMoves();
 		for (Move m : ml) {
