@@ -2,9 +2,17 @@
 
 
 
-public class Move {
-	Square from;;
+public class Move implements Comparable<Move>{
+	Square from;
 	Square to;
+
+	//Overrides
+    @Override
+    public int compareTo(Move amove) {
+        if (this.getHistory() < amove.getHistory()) return 1;
+        else if (this.getHistory() > amove.getHistory()) return -1;
+        else return 0;
+    }
 	
 	//Constructor for creating an Move object. You have to
 	//insert a string like "c1 c2"
@@ -30,7 +38,13 @@ public class Move {
 	}
 	
 
+	public int getHistory(){
+		return board.hist[this.from.toInt()][this.to.toInt()];
+	}
 	
+	public void addToHistory(){
+		board.hist[this.from.toInt()][this.to.toInt()] += 1;
+	}
 
 	/*
 	public static void main(String[] args) {
