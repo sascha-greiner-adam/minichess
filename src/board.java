@@ -32,7 +32,7 @@ public class board {
 		}
 	}
 
-	//Calculate the current score for the active player and returns it
+//Calculate the current score for the active player and returns it
 	public int getScore(){
 		int scoreWhite = 0;
 		int scoreBlack = 0;
@@ -71,7 +71,8 @@ public class board {
 		else
 			return scoreWhite - scoreBlack;
 	}
-	
+
+//Calculate the current score for the active player using extended function
 	public int getImpScore() {
 		int scoreWhite = 0;
 		int scoreBlack = 0;
@@ -169,16 +170,18 @@ public class board {
 		else
 			return scoreWhite - scoreBlack;
 	}
-//Moves a figure without check
 
+//Moves a figure on the board without check
 	public char move(Move myMove) {
-
-		int countWhite = 0; 
-		int countBlack = 0;
-
+		
 		char figure = field[myMove.from.row][myMove.from.col];
-		field[myMove.from.row][myMove.from.col]='.';
-		field[myMove.to.row][myMove.to.col]=figure;
+		try {
+			field[myMove.from.row][myMove.from.col]='.';
+			field[myMove.to.row][myMove.to.col]=figure;
+		} catch(NullPointerException e){
+			System.out.println("!!! Ziel des Moves auﬂerhalb des Feldes!");
+			e.getMessage();
+		}
 		
 		//If pawn is on the "pawn - row" at the opponent side and moves to the last line he promotes 
 		//to a queen
@@ -186,15 +189,6 @@ public class board {
 			field[6][myMove.to.col] = 'Q';
 		if(field[1][myMove.to.col] == 'p')
 			field[1][myMove.to.col] = 'q';
-		/*
-		for(int i = 1; i <= 6; i++){
-			for(int j = 1; j <= 5; j++){
-				if(field[i][j] == 'K')
-					countWhite++;
-				if(field[i][j] == 'k')
-					countBlack++;
-			}
-		}*/
 		
 		if (onMove=='B') {
 			onMove='W';
@@ -202,24 +196,11 @@ public class board {
 		} else {
 			onMove='B';
 		}
-		/*
-		if(countBlack == 0)
-			return 'W';
-		
-		else if(countWhite == 0)
-			return 'B';
-		
-		else if(moveNum >= 40)
-			return 'R';
-		
-		else
-			return '?';
-		*/
 		return gameOver();
 	}
 	
-	//Checks the game progress and returns W = white wins, B = black wins, 
-	//R = remis, ? = game in progress
+//Checks the game progress and returns W = white wins, B = black wins, 
+//R = remis, ? = game in progress
 	public char gameOver(){
 		
 		int countWhite = 0; 
@@ -243,7 +224,7 @@ public class board {
 			return '?';
 	}
 	
-	//generate all legal moves and store and return them in/as an ArrayList<Move>
+//generate all legal moves and store and return them in/as an ArrayList<Move>
 	public ArrayList<Move> legalMoves() {
 	       ArrayList<Move> moves = new ArrayList<Move>();
 	       for (int i=1; i<=6; i++) {
@@ -417,21 +398,7 @@ public class board {
 		System.out.println();
 	}
 
-	//Execute the negamax algorithm and return the score as an integer
-	public int negamax(board b, int d) {
-		int score=-10000;
-
-		if (b.gameOver() != '?' || d == 0) return b.getScore();
-
-		ArrayList<Move> ml = b.legalMoves();
-		for (Move m : ml) {
-			board b2=new board(b.toString());
-			b2.move(m);
-			score = Math.max(score, -negamax(b2,d-1));
-		}
-		return score;
-	}
-	
+//method for oving using negamax-algorithm and a given depth
 	public Move negamax_move(board b, int d) {
 		Move m0=null;
 		int v=-10000;
@@ -443,23 +410,23 @@ public class board {
 		for (Move m : movelist) {
 			copy = new board(this.toString());
 			copy.move(m);
-			v0 = Math.max(v,-negamax_prune(copy,d,-10000,-alpha));
+			v0 = Math.max(v,-negamax_prune(copy,d,-10000,-alpha,false));
 			alpha = Math.max(alpha, v0);
 			//map.put(m, v0);
 			if (v0 > v) m0 = m;
 			v = Math.max(v, v0);
-			//System.out.println(m+" : "+v0);
 		}
+		System.out.println(m0+" Score: "+v0+" Depth: "+d);
 		return m0;
 	}
-	
+
+//method for moving using negamax_move and iterative deepening
 	public Move negamax_move_id(board b, int t){
 		int d=2;
 		long now = System.currentTimeMillis();
 		Move m = negamax_move(b,d);
 		time = now+t;
 		while (time-now > 0) {
-			System.out.println("Move: "+m+" Depth: "+ d);
 			Move m2 = negamax_move(b,d++);
 			now = System.currentTimeMillis();
 			if (time-now <= 0) {
@@ -469,9 +436,10 @@ public class board {
 		}
 		return m;
 	}
-	
+
+//recursive negamax method with alpha-beta-pruning
 	//Execute the negamax algorithm with the alpha beta prune and return the score as an integer
-	public int negamax_prune(board b, int d, int alpha, int beta) {
+	public int negamax_prune(board b, int d, int alpha, int beta, boolean search_extend) {
 		//ID-Test
 		countloop++;
 		long now=0;
@@ -481,217 +449,26 @@ public class board {
 		//ID-Test END
 		
 		int score=-10000;
-		if (b.gameOver() != '?' || d == 0 || (time-now) < 0) return b.getScore();
+		if (b.gameOver() != '?' || (d == 0 && !search_extend) || (time-now) < 0) return b.getScore();
 		ArrayList<Move> ml = b.legalMoves();
 		
 		for (Move m : ml) {
 			board b2=new board(b.toString());
 			b2.move(m);
-			score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha));
+			/*
+			if (d==1 && b.getScore()+10<b2.getScore()) {
+				System.out.println("!!! Search extender");
+				score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha,true));
+			}
+			else score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha,false));
+			*/
+			score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha,false));
 			alpha = Math.max(alpha, score);
 			if (score >= beta) return score;
 		}
 		return score;
 	}
 	
-	public int negamax_prune_imp(board b, int d, int alpha, int beta) {
-		int score=-10000;
-		if (b.gameOver() != '?' || d == 0) return b.getImpScore();
-		ArrayList<Move> ml = b.legalMoves();
-		
-		for (Move m : ml) {
-			board b2=new board(b.toString());
-			b2.move(m);
-			score = Math.max(score,-negamax_prune_imp(b2,d-1,-beta,-alpha));
-			alpha = Math.max(alpha, score);
-			if (score >= beta) return score;
-		}
-		return score;
-	}
-	
-	
-	//thats the dumbest player 
-	public char dumb_random() {
-	ArrayList<Move> movelist = legalMoves();
-	double rnd = Math.random();
-	int rnd_int = (int)(rnd*movelist.size());
-	if (movelist.isEmpty()) {
-		System.out.println("Dumb Movelist leer!");
-		return '=';
-	} else {
-		Move act_move = movelist.get(rnd_int);
-		return move(act_move);
-	}
-}
-	
-	//he is the greedy dump player who takes always the nextbest move
-	public char half_dumb_random() {
-
-		int score=10000;
-		board copy = new board(this.toString());
-		ArrayList<Move> movelist = copy.legalMoves();
-		ArrayList<Move> exec_movelist = new ArrayList<Move>();
-		for (Move m : movelist) {
-			copy = new board(this.toString());
-			copy.move(m);
-			if (copy.getScore() < score) score=copy.getScore();
-		}
-		for (Move m : movelist) {
-			copy = new board(this.toString());
-			copy.move(m);
-			if (copy.getScore() <= score) {
-				exec_movelist.add(m);
-			}
-		}
-		double rnd = Math.random();
-		int rnd_int = (int)(rnd*exec_movelist.size());
-		if (movelist.isEmpty()) {
-			System.out.println("Halfdumb Movelist leer!");
-			return '=';
-		} else {
-			Move act_move = exec_movelist.get(rnd_int);
-			return move(act_move);
-		}
-		
-	}
-	
-	//he is the genius player and uses the negamax_prune algorithm and returns a Move object
-	public Move nega_prune_player() {
-		//Map<Move, Integer> map = new HashMap<Move, Integer>();
-		Move m0=null;
-		int v=-10000;
-		int v0 = 0;
-		int alpha=-10000;
-		
-		board copy = new board(this.toString());
-		ArrayList<Move> movelist = copy.legalMoves();
-		for (Move m : movelist) {
-			copy = new board(this.toString());
-			copy.move(m);
-			v0 = Math.max(v,-negamax_prune(copy,4,-10000,-alpha));
-			alpha = Math.max(alpha, v0);
-			//map.put(m, v0);
-			if (v0 > v) m0 = m;
-			v = Math.max(v, v0);
-			//System.out.println(m+" : "+v0);
-		}
-
-		return m0;
-	}
-	
-	public Move nega_prune_imp_player() {
-		//Map<Move, Integer> map = new HashMap<Move, Integer>();
-		Move m0=null;
-		int v=-10000;
-		int v0 = 0;
-		int alpha=-10000;
-		
-		board copy = new board(this.toString());
-		ArrayList<Move> movelist = copy.legalMoves();
-		for (Move m : movelist) {
-			copy = new board(this.toString());
-			copy.move(m);
-			v0 = Math.max(v,-negamax_prune(copy,5,-10000,-alpha));
-			alpha = Math.max(alpha, v0);
-			//map.put(m, v0);
-			if (v0 > v) m0 = m;
-			v = Math.max(v, v0);
-			//System.out.println(m+" : "+v0);
-		}
-
-		return m0;
-	}
-
-	
-	//he is the quick player who uses the negamax algorithm
-	public char nega_player_quick() {
-		Map<Move, Integer> map = new HashMap<Move, Integer>();
-		
-		int score=10000;
-		int negascore = 0;
-		
-		board copy = new board(this.toString());
-		ArrayList<Move> movelist = copy.legalMoves();
-		ArrayList<Move> exec_movelist = new ArrayList<Move>();
-		for (Move m : movelist) {
-			copy = new board(this.toString());
-			copy.move(m);
-			negascore = negamax(copy,3);
-			if (negascore < score) score=negascore;
-			map.put(m, negascore);
-		}
-
-		for (Map.Entry<Move, Integer> entry : map.entrySet()) {
-		    if (entry.getValue() <= score) exec_movelist.add(entry.getKey());
-		}
-		
-		double rnd = Math.random();
-		int rnd_int = (int)(rnd*exec_movelist.size());
-		if (movelist.isEmpty()) {
-			System.out.println("Negamax Movelist leer!");
-			return '=';
-		} else {
-			Move act_move = exec_movelist.get(rnd_int);
-			return move(act_move);
-		}
-	}
-	
-	//the nega_player with only the negamax algorithm without any improvements
-	public Move nega_player() {
-		
-		int score=10000;
-		int negascore = 0;
-		
-		board copy = new board(this.toString());
-		ArrayList<Move> movelist = copy.legalMoves();
-		ArrayList<Move> exec_movelist = new ArrayList<Move>();
-		for (Move m : movelist) {
-			copy = new board(this.toString());
-			copy.move(m);
-			negascore = negamax(copy,3);
-			if (negascore < score) score=negascore;
-		}
-		for (Move m : movelist) {
-			copy = new board(this.toString());
-			copy.move(m);
-			if (negamax(copy,3) <= score) {
-				exec_movelist.add(m);
-			}
-		}
-
-		double rnd = Math.random();
-		int rnd_int = (int)(rnd*exec_movelist.size());
-
-			Move act_move = exec_movelist.get(rnd_int);
-			return act_move;
-	}
-
-	public Move network_player(){
-
-		int score=10000;
-		int negascore = 0;
-		board copy = new board(this.toString());
-		ArrayList<Move> movelist = copy.legalMoves();
-		ArrayList<Move> exec_movelist = new ArrayList<Move>();
-		for (Move m : movelist) {
-			copy = new board(this.toString());
-			copy.move(m);
-			negascore = negamax(copy,3);
-			if (negascore < score) score=negascore;
-		}
-		for (Move m : movelist) {
-			copy = new board(this.toString());
-			copy.move(m);
-			if (negamax(copy,3) <= score) {
-				exec_movelist.add(m);
-			}
-		}
-		double rnd = Math.random();
-		int rnd_int = (int)(rnd*exec_movelist.size());
-			Move act_move = exec_movelist.get(rnd_int);
-			return act_move;
-		
-	}
 
 
 	public void addToHistory(Move bestMove){
@@ -708,54 +485,77 @@ public class board {
 
 	
 	//main method - start of the programm
+
 	public static void main(String[] args){
-			
+
 		Move move_result;
 		
-		String id = null;
+		String id;
 		long $startmilli = 0;
 		long $time_black = 0;
 		long $time_white = 0;
+		int intervall=0;
+		long timeToFinish = 0;
+		char color='?';
 		
 		try{
 			Client myClient = new Client("imcs.svcs.cs.pdx.edu", "3589", "ai_megachess_8000_ger", "minichess2013");
-			System.out.println(myClient);
-			
+						
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-			System.out.println("Create new game? [Y/N]");
-			String offers = in.readLine();
-			char[] trigger = offers.toCharArray();
-			char color=' ';
-			if(trigger[0] == 'Y') {
-				System.out.println("Which color?");
-				color = (char)in.read();
-				myClient.offer(color);
+			System.out.println("Choose one option:");
+			System.out.println("1 - Local game");
+			System.out.println("2 - Network game");
+			System.out.println("3 - Exit");
+			int menu = Integer.parseInt(in.readLine());
+						
+			if (menu==2) {
+				System.out.println("1 - Create new game");
+				System.out.println("2 - Join game");
+				int offers = Integer.parseInt(in.readLine());
+				
+				if (offers==1) {
+					System.out.println("Which color?");
+					System.out.println("B - Black");
+					System.out.println("W - White");
+					System.out.println("? - Random");
+					color = (char)in.read();
+					myClient.offer(color);
+				}
+				if (offers==2) {
+					System.out.println("Which game do you want to join?");
+					id = in.readLine();
+					color = myClient.accept(id, '?');
+				}
+			} else if (menu==1){			
+				color='B';
 			} else {
-				System.out.println("Which game do you want to join?");
-				in = new BufferedReader(new InputStreamReader(System.in));
-				id = in.readLine();				
+				System.exit(0);
 			}
 			
-			//color = myClient.accept(id, color);
-			color='B';
+			
 			board myBoard=new board();
 			
 			myBoard.print();
 			System.out.println(color);
+			timeToFinish = System.currentTimeMillis()+300000;
 				do{
+					
 					$startmilli = System.currentTimeMillis();
 					if (myBoard.onMove == color) {
-						move_result = myBoard.negamax_move_id(myBoard,5000);
-						//myClient.sendMove("! " + move_result.toString());			
+						intervall = (int)(timeToFinish-System.currentTimeMillis())/(40-myBoard.moveNum)-1000;
+						move_result = myBoard.negamax_move_id(myBoard,intervall);								// negamax player with pruning and time management
+						//myClient.sendMove("! " + move_result.toString());										// needed for network play	
 						$time_black += (System.currentTimeMillis()-$startmilli);
 					} else {
-						move_result = myBoard.negamax_move(myBoard,4);
-						//move_result = new Move(myClient.getMove());
+						intervall = (int)(timeToFinish-System.currentTimeMillis())/(40-myBoard.moveNum)-1000;	// needed for time management
+						move_result = myBoard.negamax_move_id(myBoard,intervall);								// negamax player with pruning and time management
+						//move_result= myBoard.half_dumb_random();												// greedy dumb player player
+						//move_result = new Move(myClient.getMove());											// needed for network play
 						$time_white+=(System.currentTimeMillis()-$startmilli);
 					}
 					myBoard.move(move_result);
-					System.out.println("Current Score: " + myBoard.getScore()+" Current ImpScore: " + myBoard.getImpScore());
+					System.out.println("Current Score: " + myBoard.getScore()+" Zeit f¸r Zug: "+intervall+ " time left: "+(timeToFinish-System.currentTimeMillis()));
 					System.out.println("=============");
 					myBoard.print();
 					System.out.println();
@@ -772,6 +572,7 @@ public class board {
 				myClient.close();
 			}
 			catch(IOException e){
+				System.out.println("!!! Connection problem");
 				e.getMessage();
 			}
 	}
