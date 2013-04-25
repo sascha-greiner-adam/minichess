@@ -15,7 +15,7 @@ public class board {
 	char onMove='W';
 	static long time;
 	static long countloop=0;
-	static int[][] hist = new int[30][30];
+	static int[][] hist = new int[57][571];
 	
 //Constructors	
 	public board() {
@@ -417,6 +417,7 @@ public class board {
 			v = Math.max(v, v0);
 		}
 		System.out.println(m0+" Score: "+v0+" Depth: "+d);
+		addToHistory(m0);
 		return m0;
 	}
 
