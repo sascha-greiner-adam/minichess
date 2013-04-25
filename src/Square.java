@@ -28,6 +28,10 @@ public class Square{
 			return "" + (char)(col + (int)'a' - 1) + (int)(row);
 		}
 		
+		public int toInt(){
+			return (10*col + row);
+		}
+		
 		public static void main(String[] args){
 			String turn = "d2";
 			Square mysquare = new Square(turn);
