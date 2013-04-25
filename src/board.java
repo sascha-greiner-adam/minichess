@@ -6,7 +6,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 import java.io.*;
 
 
@@ -14,7 +13,8 @@ public class board {
 	char[][]field={{' ',' ',' ',' ',' ',' '},{' ','R','N','B','Q','K'},{' ','P','P','P','P','P'},{' ','.','.','.','.','.'},{' ','.','.','.','.','.'},{' ','p','p','p','p','p'},{' ','k','q','b','n','r'}};
 	int moveNum=1;
 	char onMove='W';
-
+	static long time;
+	static long countloop=0;
 	
 //Constructors	
 	public board() {
@@ -31,8 +31,6 @@ public class board {
 		}
 	}
 
-	
-	
 	//Calculate the current score for the active player and returns it
 	public int getScore(){
 		int scoreWhite = 0;
@@ -42,27 +40,27 @@ public class board {
 				switch(field[i][j]){
 					case 'K': 	scoreWhite += 10000;
 								break;
-					case 'Q': 	scoreWhite += 1000;
+					case 'Q': 	scoreWhite += 100;
 								break;
-					case 'B': 	scoreWhite += 300;
+					case 'B': 	scoreWhite += 30;
 								break;
-					case 'N': 	scoreWhite += 300;
+					case 'N': 	scoreWhite += 30;
 								break;
-					case 'R': 	scoreWhite += 500;
+					case 'R': 	scoreWhite += 50;
 								break;
-					case 'P': 	scoreWhite += 100;
+					case 'P': 	scoreWhite += 10;
 								break;
 					case 'k':	scoreBlack += 10000;
 								break;
-					case 'q':	scoreBlack += 1000;
+					case 'q':	scoreBlack += 100;
 								break;
-					case 'b':	scoreBlack += 300;
+					case 'b':	scoreBlack += 30;
 								break;
-					case 'n':	scoreBlack += 300;
+					case 'n':	scoreBlack += 30;
 								break;
-					case 'r':	scoreBlack += 500;
+					case 'r':	scoreBlack += 50;
 								break;
-					case 'p':	scoreBlack += 100;
+					case 'p':	scoreBlack += 10;
 								break;
 				}
 			}
@@ -78,102 +76,92 @@ public class board {
 		int scoreBlack = 0;
 		int anz_figuren = 0;
 		int gamestate = 0;
-		int[] queen = {1000,1000,1050};
-		int[] bishop = {300,300,350};
-		int[] knight = {300,300,300};
-		int[] rook = {450,450,450};
-		int[] pawn = {100,100,100};
+		int[] queen = {100,100,120};
+		int[] bishop = {30,30,35};
+		int[] knight = {30,30,30};
+		int[] rook = {45,45,45};
+		int[] pawn = {10,10,10};
 		int[] king = {10000,10000,10000};
 		
 		if (anz_figuren < 20 && anz_figuren >= 8) gamestate = 1;
 		if (anz_figuren < 8) gamestate = 2;
 		
-		for(int i = 1; i <= 6; i++) { 
-			for(int j = 1; j <= 5; j++){
-				switch(field[i][j]){
-					case 'K': 	scoreWhite += king[gamestate];
-								//reward or penalty for central positions
-								if (i<=3 && gamestate<2) scoreWhite += -5*(i-1);
-								if (i>3 && gamestate<2) scoreWhite += -5*(6-i);
-								if (j<=3 && gamestate<2) scoreWhite += -5*(j-1);
-								if (j>3 && gamestate<2) scoreWhite += -5*(5-j);
-								anz_figuren++;
-								break;
-					case 'Q': 	scoreWhite += queen[gamestate];
-								//reward or penalty for central positions
-								if (i<=3 && gamestate<1) scoreWhite += -10*(i-1);
-								if (i>3 && gamestate<1) scoreWhite += -10*(6-i);
-								if (j<=3 && gamestate<1) scoreWhite += -10*(j-1);
-								if (j>3 && gamestate<1) scoreWhite += -10*(5-j);
-								anz_figuren++;
-								break;
-					case 'B': 	scoreWhite += bishop[gamestate];
-								anz_figuren++;
-								if (i<=3) scoreWhite += 10*(i-1);
-								if (i>3) scoreWhite += 10*(6-i);
-								if (j<=3) scoreWhite += 10*(j-1);
-								if (j>3) scoreWhite += 10*(5-j);
-								break;
-					case 'N': 	scoreWhite += knight[gamestate];
-								//reward or penalty for central positions
-								if (i<=3) scoreWhite += 5*(i-1);
-								if (i>3) scoreWhite += 5*(6-i);
-								if (j<=3) scoreWhite += 5*(j-1);
-								if (j>3) scoreWhite += 5*(5-j);
-								anz_figuren++;
-								break;
-					case 'R': 	scoreWhite += rook[gamestate];
-								anz_figuren++;
-								break;
-					case 'P': 	scoreWhite += pawn[gamestate];
-								anz_figuren++;
-								//reward for defended pawns
-								if (defends(new Square(i,j),1,1,true,'P') || defends(new Square(i,j),1,-1,true,'P')) scoreWhite += 10;
-								//penalty for backward pawns and double pawns
-								if (!defends(new Square(i,j),0,1,false,'p') && (defends(new Square(i,j),1,0,true,'P') || defends(new Square(i,j),0,1,true,'P') || defends(new Square(i,j),-1,-1,true,'P') || defends(new Square(i,j),-1,1,true,'P'))) scoreWhite -= 20; 
-								break;
-								
-					case 'k':	scoreBlack += king[gamestate];
-								//reward or penalty for central positions
-								if (i<=3 && gamestate<2) scoreBlack += -5*(i-1);
-								if (i>3 && gamestate<2) scoreBlack += -5*(6-i);
-								if (j<=3 && gamestate<2) scoreBlack += -5*(j-1);
-								if (j>3 && gamestate<2) scoreBlack += -5*(5-j);
-								anz_figuren++;
-								break;
-					case 'q':	scoreBlack += queen[gamestate];
-								//reward or penalty for central positions
-								if (i<=3 && gamestate<1) scoreBlack += -10*(i-1);
-								if (i>3 && gamestate<1) scoreBlack += -10*(6-i);
-								if (j<=3 && gamestate<1) scoreBlack += -10*(j-1);
-								if (j>3 && gamestate<1) scoreBlack += -10*(5-j);
-								anz_figuren++;
-								break;
-					case 'b':	scoreBlack += bishop[gamestate];
-								anz_figuren++;
-								if (i<=3) scoreBlack += 10*(i-1);
-								if (i>3) scoreBlack += 10*(6-i);
-								if (j<=3) scoreBlack += 10*(j-1);
-								if (j>3) scoreBlack += 10*(5-j);
-								break;
-					case 'n':	scoreBlack += knight[gamestate];
-								//reward or penalty for central positions
-								if (i<=3) scoreBlack += 5*(i-1);
-								if (i>3) scoreBlack += 5*(6-i);
-								if (j<=3) scoreBlack += 5*(j-1);
-								if (j>3) scoreBlack += 5*(5-j);
-								anz_figuren++;
-								break;
-					case 'r':	scoreBlack += rook[gamestate];
-								anz_figuren++;
-								break;
-					case 'p':	scoreBlack += pawn[gamestate];
-								anz_figuren++;
-								
-								break;
-				}	
+		for(int i = 1; i <= 6; i++){ for(int j = 1; j <= 5; j++){
+			switch(field[i][j]){
+				case 'K': 	scoreWhite += king[gamestate];
+							//reward or penalty for central positions
+							if (i<=3 && gamestate<2) scoreWhite += -1*(i-1);
+							if (i>3 && gamestate<2) scoreWhite += -1*(6-i);
+							if (j<=3 && gamestate<2) scoreWhite += -1*(j-1);
+							if (j>3 && gamestate<2) scoreWhite += -1*(5-j);
+							anz_figuren++;
+							break;
+				case 'Q': 	scoreWhite += queen[gamestate];
+							//reward or penalty for central positions
+							if (i<=3 && gamestate<1) scoreWhite += -2*(i-1);
+							if (i>3 && gamestate<1) scoreWhite += -2*(6-i);
+							if (j<=3 && gamestate<1) scoreWhite += -2*(j-1);
+							if (j>3 && gamestate<1) scoreWhite += -2*(5-j);
+							anz_figuren++;
+							break;
+				case 'B': 	scoreWhite += bishop[gamestate];
+							anz_figuren++;
+							break;
+				case 'N': 	scoreWhite += knight[gamestate];
+							//reward or penalty for central positions
+							if (i<=3) scoreWhite += 1*(i-1);
+							if (i>3) scoreWhite += 1*(6-i);
+							if (j<=3) scoreWhite += 1*(j-1);
+							if (j>3) scoreWhite += 1*(5-j);
+							anz_figuren++;
+							break;
+				case 'R': 	scoreWhite += rook[gamestate];
+							anz_figuren++;
+							break;
+				case 'P': 	scoreWhite += pawn[gamestate];
+							anz_figuren++;
+							//reward for defended pawns
+							if (defends(new Square(i,j),1,1,true,'P') || defends(new Square(i,j),1,-1,true,'P')) scoreWhite += 2;
+							//penalty for backward pawns and double pawns
+							if (!defends(new Square(i,j),0,1,false,'p') && (defends(new Square(i,j),1,0,true,'P') || defends(new Square(i,j),0,1,true,'P') || defends(new Square(i,j),-1,-1,true,'P') || defends(new Square(i,j),-1,1,true,'P'))) scoreWhite -= 6; 
+							break;
+							
+				case 'k':	scoreBlack += king[gamestate];
+							//reward or penalty for central positions
+							if (i<=3 && gamestate<2) scoreBlack += -1*(i-1);
+							if (i>3 && gamestate<2) scoreBlack += -1*(6-i);
+							if (j<=3 && gamestate<2) scoreBlack += -1*(j-1);
+							if (j>3 && gamestate<2) scoreBlack += -1*(5-j);
+							anz_figuren++;
+							break;
+				case 'q':	scoreBlack += queen[gamestate];
+							//reward or penalty for central positions
+							if (i<=3 && gamestate<1) scoreBlack += -2*(i-1);
+							if (i>3 && gamestate<1) scoreBlack += -2*(6-i);
+							if (j<=3 && gamestate<1) scoreBlack += -2*(j-1);
+							if (j>3 && gamestate<1) scoreBlack += -2*(5-j);
+							anz_figuren++;
+							break;
+				case 'b':	scoreBlack += bishop[gamestate];
+							anz_figuren++;
+							break;
+				case 'n':	scoreBlack += knight[gamestate];
+							//reward or penalty for central positions
+							if (i<=3) scoreBlack += 1*(i-1);
+							if (i>3) scoreBlack += 1*(6-i);
+							if (j<=3) scoreBlack += 1*(j-1);
+							if (j>3) scoreBlack += 1*(5-j);
+							anz_figuren++;
+							break;
+				case 'r':	scoreBlack += rook[gamestate];
+							anz_figuren++;
+							break;
+				case 'p':	scoreBlack += pawn[gamestate];
+							anz_figuren++;
+							
+							break;
 			}
-		}
+		}}
 
 		if(onMove == 'B')
 			return scoreBlack - scoreWhite;
@@ -228,9 +216,6 @@ public class board {
 		*/
 		return gameOver();
 	}
-	
-	 
-	
 	
 	//Checks the game progress and returns W = white wins, B = black wins, 
 	//R = remis, ? = game in progress
@@ -434,6 +419,7 @@ public class board {
 	//Execute the negamax algorithm and return the score as an integer
 	public int negamax(board b, int d) {
 		int score=-10000;
+
 		if (b.gameOver() != '?' || d == 0) return b.getScore();
 
 		ArrayList<Move> ml = b.legalMoves();
@@ -445,33 +431,56 @@ public class board {
 		return score;
 	}
 	
-	//Execute the negamax algorithm and return the score as an integer
-	public int negamax_iter(board b) {
-		
-		
-		
-		int score=-10000;
-		int d = 0;
-		
-		if (b.gameOver() != '?' || d == 0) return b.getScore();
-			
-		ArrayList<Move> ml = b.legalMoves();
-		
-		
-		
-		for (Move m : ml) {
-			board b2=new board(b.toString());
-			b2.move(m);
-			score = Math.max(score, -negamax(b2,d-1));
+	public Move negamax_move(board b, int d) {
+		Move m0=null;
+		int v=-10000;
+		int v0 = 0;
+		int alpha=-10000;
+		board copy = new board(this.toString());
+		ArrayList<Move> movelist = copy.legalMoves();
+
+		for (Move m : movelist) {
+			copy = new board(this.toString());
+			copy.move(m);
+			v0 = Math.max(v,-negamax_prune(copy,d,-10000,-alpha));
+			alpha = Math.max(alpha, v0);
+			//map.put(m, v0);
+			if (v0 > v) m0 = m;
+			v = Math.max(v, v0);
+			//System.out.println(m+" : "+v0);
 		}
-		return score;
+		return m0;
 	}
 	
+	public Move negamax_move_id(board b, int t){
+		int d=2;
+		long now = System.currentTimeMillis();
+		Move m = negamax_move(b,d);
+		time = now+t;
+		while (time-now > 0) {
+			System.out.println("Move: "+m+" Depth: "+ d);
+			Move m2 = negamax_move(b,d++);
+			now = System.currentTimeMillis();
+			if (time-now <= 0) {
+				return m;
+			}
+			m=m2;
+		}
+		return m;
+	}
 	
 	//Execute the negamax algorithm with the alpha beta prune and return the score as an integer
 	public int negamax_prune(board b, int d, int alpha, int beta) {
+		//ID-Test
+		countloop++;
+		long now=0;
+		//if (countloop % 100 == 0) {
+			now = System.currentTimeMillis();
+		//}
+		//ID-Test END
+		
 		int score=-10000;
-		if (b.gameOver() != '?' || d == 0) return b.getScore();
+		if (b.gameOver() != '?' || d == 0 || (time-now) < 0) return b.getScore();
 		ArrayList<Move> ml = b.legalMoves();
 		
 		for (Move m : ml) {
@@ -558,7 +567,7 @@ public class board {
 		for (Move m : movelist) {
 			copy = new board(this.toString());
 			copy.move(m);
-			v0 = Math.max(v,-negamax_prune(copy,5,-10000,-alpha));
+			v0 = Math.max(v,-negamax_prune(copy,4,-10000,-alpha));
 			alpha = Math.max(alpha, v0);
 			//map.put(m, v0);
 			if (v0 > v) m0 = m;
@@ -569,33 +578,29 @@ public class board {
 		return m0;
 	}
 	
-	//this is a genius player which uses the negamax_prune algorithm and a modified getScore method for better strategy
 	public Move nega_prune_imp_player() {
-		
 		//Map<Move, Integer> map = new HashMap<Move, Integer>();
 		Move m0=null;
 		int v=-10000;
 		int v0 = 0;
 		int alpha=-10000;
-		int rnd;
+		
 		board copy = new board(this.toString());
 		ArrayList<Move> movelist = copy.legalMoves();
 		for (Move m : movelist) {
 			copy = new board(this.toString());
 			copy.move(m);
-			v0 = Math.max(v,-negamax_prune(copy,4,-10000,-alpha));
+			v0 = Math.max(v,-negamax_prune(copy,5,-10000,-alpha));
 			alpha = Math.max(alpha, v0);
 			//map.put(m, v0);
-			rnd = (int)(Math.min(v0*0.005,10)-(Math.min(v0*0.01,20)*Math.random()));
-			if (v0+rnd > v) m0 = m;
+			if (v0 > v) m0 = m;
 			v = Math.max(v, v0);
 			//System.out.println(m+" : "+v0);
 		}
 
 		return m0;
-		
 	}
-	
+
 	
 	//he is the quick player who uses the negamax algorithm
 	public char nega_player_quick() {
@@ -716,34 +721,35 @@ public class board {
 				id = in.readLine();				
 			}
 			
-			color = myClient.accept(id, color);
-			//color='B';
+			//color = myClient.accept(id, color);
+			color='B';
 			board myBoard=new board();
 			
 			myBoard.print();
 			System.out.println(color);
 				do{
-					System.out.println("Current Score: " + myBoard.getScore()+" Current ImpScore: " + myBoard.getImpScore());
-					System.out.println("=======================================");
-					myBoard.print();
 					$startmilli = System.currentTimeMillis();
 					if (myBoard.onMove == color) {
-						move_result = myBoard.nega_prune_player();
-						myClient.sendMove("! " + move_result.toString());						
+						move_result = myBoard.negamax_move_id(myBoard,5000);
+						//myClient.sendMove("! " + move_result.toString());			
 						$time_black += (System.currentTimeMillis()-$startmilli);
 					} else {
-						//move_result = myBoard.nega_prune_player();
-						move_result = new Move(myClient.getMove());
+						move_result = myBoard.negamax_move(myBoard,4);
+						//move_result = new Move(myClient.getMove());
 						$time_white+=(System.currentTimeMillis()-$startmilli);
 					}
 					myBoard.move(move_result);
+					System.out.println("Current Score: " + myBoard.getScore()+" Current ImpScore: " + myBoard.getImpScore());
+					System.out.println("=============");
+					myBoard.print();
+					System.out.println();
 
 				} while(myBoard.gameOver() == '?');
 
 				if (myBoard.gameOver()=='B') System.out.println("Black wins");
 				if (myBoard.gameOver()=='W') System.out.println("White wins");
 				if (myBoard.gameOver()=='R') System.out.println("Remis");
-				myBoard.print();
+
 				System.out.println("Black needs around "+($time_black/myBoard.moveNum)+" Millisconds per move");
 				System.out.println("White needs around "+($time_white/myBoard.moveNum)+" Millisconds per move");
 
