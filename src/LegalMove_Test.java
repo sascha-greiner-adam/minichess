@@ -2,17 +2,17 @@
 
 public class LegalMove_Test {
 	
-	static String field_pawn_begin	="41 W ....." +
-											"....." +
-											".k.q." +
-											"P...." +
-											"....." +
-											"..K..";
+	static String field_pawn_begin	="0 W ....." +
+											"k...." +
+											"....p" +
+											".p.r." +
+											"..Q.." +
+											"K....";
 	
 	public static void main(String[] args) {
 		board myBoard = new board(field_pawn_begin);
-		
-		System.out.println("Legal Moves: " + myBoard.legalMoves() + "Score: " + myBoard.negamax_move(myBoard, 2));
+		myBoard.time_left=5;
+		System.out.println("Legal Moves: " + myBoard.legalMoves() + "Move: " + myBoard.negamax_move(myBoard, 5));
 		System.out.println("Result: " + myBoard.gameOver());
 		
 	}

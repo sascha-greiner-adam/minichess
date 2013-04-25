@@ -14,6 +14,7 @@ public class board {
 	int moveNum=1;
 	char onMove='W';
 	static long time;
+	static int time_left;
 	static long countloop=0;
 	static int[][] hist = new int[30][30];
 	
@@ -426,10 +427,12 @@ public class board {
 		long now = System.currentTimeMillis();
 		Move m = negamax_move(b,d);
 		time = now+t;
-		while (time-now > 0) {
+		time_left = (int)(time-now);
+		while (time_left > 0) {
 			Move m2 = negamax_move(b,d++);
 			now = System.currentTimeMillis();
-			if (time-now <= 0) {
+			if (time_left <= 0) {
+				System.out.println("Out of Time! Take "+m);
 				return m;
 			}
 			m=m2;
@@ -443,26 +446,29 @@ public class board {
 		//ID-Test
 		countloop++;
 		long now=0;
-		//if (countloop % 100 == 0) {
+		if (countloop % 10000 == 0) {
 			now = System.currentTimeMillis();
-		//}
+			time_left = (int)(time-now);
+		}
 		//ID-Test END
 		
 		int score=-10000;
-		if (b.gameOver() != '?' || (d == 0 && !search_extend) || (time-now) < 0) return b.getScore();
+		if ((b.gameOver() != '?') || (search_extend && (d < 0)) || (!search_extend && (d < 1)) || (!search_extend && (time_left < 0))) return b.getScore();
 		ArrayList<Move> ml = b.legalMoves();
 		
 		for (Move m : ml) {
 			board b2=new board(b.toString());
 			b2.move(m);
-			/*
-			if (d==1 && b.getScore()+10<b2.getScore()) {
-				System.out.println("!!! Search extender");
-				score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha,true));
-			}
-			else score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha,false));
-			*/
-			score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha,false));
+			
+			
+			//System.out.println("Move: "+m+" Old score: "+b.getScore()+" new score: "+b2.getScore());
+//			if (-b2.getScore()>b.getScore()) {
+//				System.out.println("Search extended");
+//				score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha,true));
+//			} else 
+				score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha,false));
+			
+			//score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha,false));
 			alpha = Math.max(alpha, score);
 			if (score >= beta) return score;
 		}
@@ -534,7 +540,12 @@ public class board {
 			}
 			
 			
-			board myBoard=new board();
+			board myBoard=new board("0 W ....." +
+					"k...." +
+					"....p" +
+					".p.r." +
+					"..Q.." +
+					"K....");
 			
 			myBoard.print();
 			System.out.println(color);
@@ -543,7 +554,7 @@ public class board {
 					
 					$startmilli = System.currentTimeMillis();
 					if (myBoard.onMove == color) {
-						intervall = (int)(timeToFinish-System.currentTimeMillis())/(40-myBoard.moveNum)-1000;
+						intervall = (int)(timeToFinish-System.currentTimeMillis())/(40-Math.min(myBoard.moveNum,39))-1000;
 						move_result = myBoard.negamax_move_id(myBoard,intervall);								// negamax player with pruning and time management
 						if (menu==2) myClient.sendMove("! " + move_result.toString());										// needed for network play	
 						$time_black += (System.currentTimeMillis()-$startmilli);
