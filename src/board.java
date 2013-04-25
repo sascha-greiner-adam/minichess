@@ -15,6 +15,7 @@ public class board {
 	char onMove='W';
 	static long time;
 	static long countloop=0;
+	static int[][] hist = new int[30][30];
 	
 //Constructors	
 	public board() {
@@ -468,7 +469,23 @@ public class board {
 		return score;
 	}
 	
-//main method - start of the programm
+
+
+	public void addToHistory(Move bestMove){
+		
+		
+		hist[bestMove.from.toInt()][bestMove.to.toInt()] += 1;
+
+	}
+	
+	public int getHistory(Move bestMove){
+		return hist[bestMove.from.toInt()][bestMove.to.toInt()];
+
+	}
+
+	
+	//main method - start of the programm
+
 	public static void main(String[] args){
 
 		Move move_result;
