@@ -229,6 +229,9 @@ public class board {
 		return gameOver();
 	}
 	
+	 
+	
+	
 	//Checks the game progress and returns W = white wins, B = black wins, 
 	//R = remis, ? = game in progress
 	public char gameOver(){
@@ -442,6 +445,29 @@ public class board {
 		return score;
 	}
 	
+	//Execute the negamax algorithm and return the score as an integer
+	public int negamax_iter(board b) {
+		
+		
+		
+		int score=-10000;
+		int d = 0;
+		
+		if (b.gameOver() != '?' || d == 0) return b.getScore();
+			
+		ArrayList<Move> ml = b.legalMoves();
+		
+		
+		
+		for (Move m : ml) {
+			board b2=new board(b.toString());
+			b2.move(m);
+			score = Math.max(score, -negamax(b2,d-1));
+		}
+		return score;
+	}
+	
+	
 	//Execute the negamax algorithm with the alpha beta prune and return the score as an integer
 	public int negamax_prune(board b, int d, int alpha, int beta) {
 		int score=-10000;
@@ -532,7 +558,7 @@ public class board {
 		for (Move m : movelist) {
 			copy = new board(this.toString());
 			copy.move(m);
-			v0 = Math.max(v,-negamax_prune(copy,4,-10000,-alpha));
+			v0 = Math.max(v,-negamax_prune(copy,5,-10000,-alpha));
 			alpha = Math.max(alpha, v0);
 			//map.put(m, v0);
 			if (v0 > v) m0 = m;
@@ -690,8 +716,8 @@ public class board {
 				id = in.readLine();				
 			}
 			
-			//color = myClient.accept(id, color);
-			color='B';
+			color = myClient.accept(id, color);
+			//color='B';
 			board myBoard=new board();
 			
 			myBoard.print();
@@ -703,11 +729,11 @@ public class board {
 					$startmilli = System.currentTimeMillis();
 					if (myBoard.onMove == color) {
 						move_result = myBoard.nega_prune_player();
-						//myClient.sendMove("! " + move_result.toString());						
+						myClient.sendMove("! " + move_result.toString());						
 						$time_black += (System.currentTimeMillis()-$startmilli);
 					} else {
-						move_result = myBoard.nega_prune_player();
-						//move_result = new Move(myClient.getMove());
+						//move_result = myBoard.nega_prune_player();
+						move_result = new Move(myClient.getMove());
 						$time_white+=(System.currentTimeMillis()-$startmilli);
 					}
 					myBoard.move(move_result);
