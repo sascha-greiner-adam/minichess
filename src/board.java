@@ -6,6 +6,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.io.*;
 
 
@@ -30,6 +31,8 @@ public class board {
 		}
 	}
 
+	
+	
 	//Calculate the current score for the active player and returns it
 	public int getScore(){
 		int scoreWhite = 0;
@@ -85,90 +88,92 @@ public class board {
 		if (anz_figuren < 20 && anz_figuren >= 8) gamestate = 1;
 		if (anz_figuren < 8) gamestate = 2;
 		
-		for(int i = 1; i <= 6; i++){ for(int j = 1; j <= 5; j++){
-			switch(field[i][j]){
-				case 'K': 	scoreWhite += king[gamestate];
-							//reward or penalty for central positions
-							if (i<=3 && gamestate<2) scoreWhite += -5*(i-1);
-							if (i>3 && gamestate<2) scoreWhite += -5*(6-i);
-							if (j<=3 && gamestate<2) scoreWhite += -5*(j-1);
-							if (j>3 && gamestate<2) scoreWhite += -5*(5-j);
-							anz_figuren++;
-							break;
-				case 'Q': 	scoreWhite += queen[gamestate];
-							//reward or penalty for central positions
-							if (i<=3 && gamestate<1) scoreWhite += -10*(i-1);
-							if (i>3 && gamestate<1) scoreWhite += -10*(6-i);
-							if (j<=3 && gamestate<1) scoreWhite += -10*(j-1);
-							if (j>3 && gamestate<1) scoreWhite += -10*(5-j);
-							anz_figuren++;
-							break;
-				case 'B': 	scoreWhite += bishop[gamestate];
-							anz_figuren++;
-							if (i<=3) scoreWhite += 10*(i-1);
-							if (i>3) scoreWhite += 10*(6-i);
-							if (j<=3) scoreWhite += 10*(j-1);
-							if (j>3) scoreWhite += 10*(5-j);
-							break;
-				case 'N': 	scoreWhite += knight[gamestate];
-							//reward or penalty for central positions
-							if (i<=3) scoreWhite += 5*(i-1);
-							if (i>3) scoreWhite += 5*(6-i);
-							if (j<=3) scoreWhite += 5*(j-1);
-							if (j>3) scoreWhite += 5*(5-j);
-							anz_figuren++;
-							break;
-				case 'R': 	scoreWhite += rook[gamestate];
-							anz_figuren++;
-							break;
-				case 'P': 	scoreWhite += pawn[gamestate];
-							anz_figuren++;
-							//reward for defended pawns
-							if (defends(new Square(i,j),1,1,true,'P') || defends(new Square(i,j),1,-1,true,'P')) scoreWhite += 10;
-							//penalty for backward pawns and double pawns
-							if (!defends(new Square(i,j),0,1,false,'p') && (defends(new Square(i,j),1,0,true,'P') || defends(new Square(i,j),0,1,true,'P') || defends(new Square(i,j),-1,-1,true,'P') || defends(new Square(i,j),-1,1,true,'P'))) scoreWhite -= 20; 
-							break;
-							
-				case 'k':	scoreBlack += king[gamestate];
-							//reward or penalty for central positions
-							if (i<=3 && gamestate<2) scoreBlack += -5*(i-1);
-							if (i>3 && gamestate<2) scoreBlack += -5*(6-i);
-							if (j<=3 && gamestate<2) scoreBlack += -5*(j-1);
-							if (j>3 && gamestate<2) scoreBlack += -5*(5-j);
-							anz_figuren++;
-							break;
-				case 'q':	scoreBlack += queen[gamestate];
-							//reward or penalty for central positions
-							if (i<=3 && gamestate<1) scoreBlack += -10*(i-1);
-							if (i>3 && gamestate<1) scoreBlack += -10*(6-i);
-							if (j<=3 && gamestate<1) scoreBlack += -10*(j-1);
-							if (j>3 && gamestate<1) scoreBlack += -10*(5-j);
-							anz_figuren++;
-							break;
-				case 'b':	scoreBlack += bishop[gamestate];
-							anz_figuren++;
-							if (i<=3) scoreBlack += 10*(i-1);
-							if (i>3) scoreBlack += 10*(6-i);
-							if (j<=3) scoreBlack += 10*(j-1);
-							if (j>3) scoreBlack += 10*(5-j);
-							break;
-				case 'n':	scoreBlack += knight[gamestate];
-							//reward or penalty for central positions
-							if (i<=3) scoreBlack += 5*(i-1);
-							if (i>3) scoreBlack += 5*(6-i);
-							if (j<=3) scoreBlack += 5*(j-1);
-							if (j>3) scoreBlack += 5*(5-j);
-							anz_figuren++;
-							break;
-				case 'r':	scoreBlack += rook[gamestate];
-							anz_figuren++;
-							break;
-				case 'p':	scoreBlack += pawn[gamestate];
-							anz_figuren++;
-							
-							break;
+		for(int i = 1; i <= 6; i++) { 
+			for(int j = 1; j <= 5; j++){
+				switch(field[i][j]){
+					case 'K': 	scoreWhite += king[gamestate];
+								//reward or penalty for central positions
+								if (i<=3 && gamestate<2) scoreWhite += -5*(i-1);
+								if (i>3 && gamestate<2) scoreWhite += -5*(6-i);
+								if (j<=3 && gamestate<2) scoreWhite += -5*(j-1);
+								if (j>3 && gamestate<2) scoreWhite += -5*(5-j);
+								anz_figuren++;
+								break;
+					case 'Q': 	scoreWhite += queen[gamestate];
+								//reward or penalty for central positions
+								if (i<=3 && gamestate<1) scoreWhite += -10*(i-1);
+								if (i>3 && gamestate<1) scoreWhite += -10*(6-i);
+								if (j<=3 && gamestate<1) scoreWhite += -10*(j-1);
+								if (j>3 && gamestate<1) scoreWhite += -10*(5-j);
+								anz_figuren++;
+								break;
+					case 'B': 	scoreWhite += bishop[gamestate];
+								anz_figuren++;
+								if (i<=3) scoreWhite += 10*(i-1);
+								if (i>3) scoreWhite += 10*(6-i);
+								if (j<=3) scoreWhite += 10*(j-1);
+								if (j>3) scoreWhite += 10*(5-j);
+								break;
+					case 'N': 	scoreWhite += knight[gamestate];
+								//reward or penalty for central positions
+								if (i<=3) scoreWhite += 5*(i-1);
+								if (i>3) scoreWhite += 5*(6-i);
+								if (j<=3) scoreWhite += 5*(j-1);
+								if (j>3) scoreWhite += 5*(5-j);
+								anz_figuren++;
+								break;
+					case 'R': 	scoreWhite += rook[gamestate];
+								anz_figuren++;
+								break;
+					case 'P': 	scoreWhite += pawn[gamestate];
+								anz_figuren++;
+								//reward for defended pawns
+								if (defends(new Square(i,j),1,1,true,'P') || defends(new Square(i,j),1,-1,true,'P')) scoreWhite += 10;
+								//penalty for backward pawns and double pawns
+								if (!defends(new Square(i,j),0,1,false,'p') && (defends(new Square(i,j),1,0,true,'P') || defends(new Square(i,j),0,1,true,'P') || defends(new Square(i,j),-1,-1,true,'P') || defends(new Square(i,j),-1,1,true,'P'))) scoreWhite -= 20; 
+								break;
+								
+					case 'k':	scoreBlack += king[gamestate];
+								//reward or penalty for central positions
+								if (i<=3 && gamestate<2) scoreBlack += -5*(i-1);
+								if (i>3 && gamestate<2) scoreBlack += -5*(6-i);
+								if (j<=3 && gamestate<2) scoreBlack += -5*(j-1);
+								if (j>3 && gamestate<2) scoreBlack += -5*(5-j);
+								anz_figuren++;
+								break;
+					case 'q':	scoreBlack += queen[gamestate];
+								//reward or penalty for central positions
+								if (i<=3 && gamestate<1) scoreBlack += -10*(i-1);
+								if (i>3 && gamestate<1) scoreBlack += -10*(6-i);
+								if (j<=3 && gamestate<1) scoreBlack += -10*(j-1);
+								if (j>3 && gamestate<1) scoreBlack += -10*(5-j);
+								anz_figuren++;
+								break;
+					case 'b':	scoreBlack += bishop[gamestate];
+								anz_figuren++;
+								if (i<=3) scoreBlack += 10*(i-1);
+								if (i>3) scoreBlack += 10*(6-i);
+								if (j<=3) scoreBlack += 10*(j-1);
+								if (j>3) scoreBlack += 10*(5-j);
+								break;
+					case 'n':	scoreBlack += knight[gamestate];
+								//reward or penalty for central positions
+								if (i<=3) scoreBlack += 5*(i-1);
+								if (i>3) scoreBlack += 5*(6-i);
+								if (j<=3) scoreBlack += 5*(j-1);
+								if (j>3) scoreBlack += 5*(5-j);
+								anz_figuren++;
+								break;
+					case 'r':	scoreBlack += rook[gamestate];
+								anz_figuren++;
+								break;
+					case 'p':	scoreBlack += pawn[gamestate];
+								anz_figuren++;
+								
+								break;
+				}	
 			}
-		}}
+		}
 
 		if(onMove == 'B')
 			return scoreBlack - scoreWhite;
@@ -527,7 +532,7 @@ public class board {
 		for (Move m : movelist) {
 			copy = new board(this.toString());
 			copy.move(m);
-			v0 = Math.max(v,-negamax_prune(copy,5,-10000,-alpha));
+			v0 = Math.max(v,-negamax_prune(copy,4,-10000,-alpha));
 			alpha = Math.max(alpha, v0);
 			//map.put(m, v0);
 			if (v0 > v) m0 = m;
