@@ -528,13 +528,13 @@ public class board {
 					if (myBoard.onMove == color) {
 						intervall = (int)(timeToFinish-System.currentTimeMillis())/(40-myBoard.moveNum)-1000;
 						move_result = myBoard.negamax_move_id(myBoard,intervall);								// negamax player with pruning and time management
-						//myClient.sendMove("! " + move_result.toString());										// needed for network play	
+						if (menu==2) myClient.sendMove("! " + move_result.toString());										// needed for network play	
 						$time_black += (System.currentTimeMillis()-$startmilli);
 					} else {
 						intervall = (int)(timeToFinish-System.currentTimeMillis())/(40-myBoard.moveNum)-1000;	// needed for time management
-						move_result = myBoard.negamax_move_id(myBoard,intervall);								// negamax player with pruning and time management
 						//move_result= myBoard.half_dumb_random();												// greedy dumb player player
-						//move_result = new Move(myClient.getMove());											// needed for network play
+						if (menu==2) move_result = new Move(myClient.getMove());
+						else move_result = myBoard.negamax_move_id(myBoard,intervall);								// negamax player with pruning and time management
 						$time_white+=(System.currentTimeMillis()-$startmilli);
 					}
 					myBoard.move(move_result);
