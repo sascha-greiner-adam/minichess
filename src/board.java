@@ -13,7 +13,8 @@ public class board {
 	char[][]field={{' ',' ',' ',' ',' ',' '},{' ','R','N','B','Q','K'},{' ','P','P','P','P','P'},{' ','.','.','.','.','.'},{' ','.','.','.','.','.'},{' ','p','p','p','p','p'},{' ','k','q','b','n','r'}};
 	int moveNum=1;
 	char onMove='W';
-
+	static long time;
+	static long countloop=0;
 	
 //Constructors	
 	public board() {
@@ -418,6 +419,7 @@ public class board {
 	//Execute the negamax algorithm and return the score as an integer
 	public int negamax(board b, int d) {
 		int score=-10000;
+
 		if (b.gameOver() != '?' || d == 0) return b.getScore();
 
 		ArrayList<Move> ml = b.legalMoves();
@@ -429,10 +431,56 @@ public class board {
 		return score;
 	}
 	
+	public Move negamax_move(board b, int d) {
+		Move m0=null;
+		int v=-10000;
+		int v0 = 0;
+		int alpha=-10000;
+		board copy = new board(this.toString());
+		ArrayList<Move> movelist = copy.legalMoves();
+
+		for (Move m : movelist) {
+			copy = new board(this.toString());
+			copy.move(m);
+			v0 = Math.max(v,-negamax_prune(copy,d,-10000,-alpha));
+			alpha = Math.max(alpha, v0);
+			//map.put(m, v0);
+			if (v0 > v) m0 = m;
+			v = Math.max(v, v0);
+			//System.out.println(m+" : "+v0);
+		}
+		return m0;
+	}
+	
+	public Move negamax_move_id(board b, int t){
+		int d=2;
+		long now = System.currentTimeMillis();
+		Move m = negamax_move(b,d);
+		time = now+t;
+		while (time-now > 0) {
+			System.out.println("Move: "+m+" Depth: "+ d);
+			Move m2 = negamax_move(b,d++);
+			now = System.currentTimeMillis();
+			if (time-now <= 0) {
+				return m;
+			}
+			m=m2;
+		}
+		return m;
+	}
+	
 	//Execute the negamax algorithm with the alpha beta prune and return the score as an integer
 	public int negamax_prune(board b, int d, int alpha, int beta) {
+		//ID-Test
+		countloop++;
+		long now=0;
+		//if (countloop % 100 == 0) {
+			now = System.currentTimeMillis();
+		//}
+		//ID-Test END
+		
 		int score=-10000;
-		if (b.gameOver() != '?' || d == 0) return b.getScore();
+		if (b.gameOver() != '?' || d == 0 || (time-now) < 0) return b.getScore();
 		ArrayList<Move> ml = b.legalMoves();
 		
 		for (Move m : ml) {
@@ -453,7 +501,7 @@ public class board {
 		for (Move m : ml) {
 			board b2=new board(b.toString());
 			b2.move(m);
-			score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha));
+			score = Math.max(score,-negamax_prune_imp(b2,d-1,-beta,-alpha));
 			alpha = Math.max(alpha, score);
 			if (score >= beta) return score;
 		}
@@ -519,7 +567,7 @@ public class board {
 		for (Move m : movelist) {
 			copy = new board(this.toString());
 			copy.move(m);
-			v0 = Math.max(v,-negamax_prune(copy,5,-10000,-alpha));
+			v0 = Math.max(v,-negamax_prune(copy,4,-10000,-alpha));
 			alpha = Math.max(alpha, v0);
 			//map.put(m, v0);
 			if (v0 > v) m0 = m;
@@ -552,7 +600,7 @@ public class board {
 
 		return m0;
 	}
-	
+
 	
 	//he is the quick player who uses the negamax algorithm
 	public char nega_player_quick() {
@@ -682,11 +730,11 @@ public class board {
 				do{
 					$startmilli = System.currentTimeMillis();
 					if (myBoard.onMove == color) {
-						move_result = myBoard.nega_prune_imp_player();
-						//myClient.sendMove("! " + move_result.toString());						
+						move_result = myBoard.negamax_move_id(myBoard,5000);
+						//myClient.sendMove("! " + move_result.toString());			
 						$time_black += (System.currentTimeMillis()-$startmilli);
 					} else {
-						move_result = myBoard.nega_prune_player();
+						move_result = myBoard.negamax_move(myBoard,4);
 						//move_result = new Move(myClient.getMove());
 						$time_white+=(System.currentTimeMillis()-$startmilli);
 					}
