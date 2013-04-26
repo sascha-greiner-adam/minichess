@@ -6,17 +6,20 @@ public class History_Test {
 	public static void main(String[] args) {
 		
 		board myBoard = new board(field_pawn_begin);
+		
+		myBoard.loadHistory("hist_test.txt");
 		Move myMove = new Move("a5-a4");
-		myBoard.addToHistory(myMove);
-		myBoard.addToHistory(myMove);
-		myBoard.addToHistory(myMove);
-		myBoard.addToHistory(myMove);
-		myBoard.addToHistory(myMove);
-		myBoard.addToHistory(myMove);
 
+		System.out.println(myMove.getHistory());
 		
+		myMove.addToHistory();
+		myMove.addToHistory();
+		myMove.addToHistory();
+		myMove.addToHistory();
+		myMove.addToHistory();
 		
-		System.out.println(myBoard.getHistory(myMove));
+		System.out.println(myMove.getHistory());
+		myBoard.saveHistory("hist_test.txt");
 	}
 
 }

@@ -3,11 +3,14 @@
 
 */
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.io.*;
-
+import java.util.Collections;
 
 public class board {
 	char[][]field={{' ',' ',' ',' ',' ',' '},{' ','R','N','B','Q','K'},{' ','P','P','P','P','P'},{' ','.','.','.','.','.'},{' ','.','.','.','.','.'},{' ','p','p','p','p','p'},{' ','k','q','b','n','r'}};
@@ -16,8 +19,9 @@ public class board {
 	static long time;
 	static int time_left;
 	static long countloop=0;
-	static int[][] hist = new int[57][571];
-	
+	static int[][] hist = new int[57][57];
+
+
 //Constructors	
 	public board() {
 	}
@@ -394,12 +398,13 @@ public class board {
 			for (int j=1; j<=5; j++) {
 				print_out=print_out+field[i][j];
 			}
-			System.out.println(print_out);
+			System.out.println(i+" "+print_out);
 		}
 		System.out.println();
+		System.out.println("  ABCDE");
 	}
 
-//method for oving using negamax-algorithm and a given depth
+//method for moving using negamax-algorithm and a given depth
 	public Move negamax_move(board b, int d) {
 		Move m0=null;
 		int v=-10000;
@@ -407,7 +412,6 @@ public class board {
 		int alpha=-10000;
 		board copy = new board(this.toString());
 		ArrayList<Move> movelist = copy.legalMoves();
-
 		for (Move m : movelist) {
 			copy = new board(this.toString());
 			copy.move(m);
@@ -417,23 +421,23 @@ public class board {
 			if (v0 > v) m0 = m;
 			v = Math.max(v, v0);
 		}
-		System.out.println(m0+" Score: "+v0+" Depth: "+d);
-		addToHistory(m0);
+		//System.out.println(m0+" - "+v0+" Depth: "+d);
 		return m0;
 	}
 
 //method for moving using negamax_move and iterative deepening
 	public Move negamax_move_id(board b, int t){
-		int d=2;
+		int d=0;
 		long now = System.currentTimeMillis();
-		Move m = negamax_move(b,d);
+		Move m = null;
 		time = now+t;
 		time_left = (int)(time-now);
 		while (time_left > 0) {
 			Move m2 = negamax_move(b,d++);
 			now = System.currentTimeMillis();
+			time_left = (int)(time-now);
 			if (time_left <= 0) {
-				System.out.println("Out of Time! Take "+m);
+				//System.out.println("Move: "+m+" Depth: "+d);
 				return m;
 			}
 			m=m2;
@@ -442,7 +446,8 @@ public class board {
 	}
 
 //recursive negamax method with alpha-beta-pruning
-	//Execute the negamax algorithm with the alpha beta prune and return the score as an integer
+
+//Execute the negamax algorithm with the alpha beta prune and return the score as an integer
 	public int negamax_prune(board b, int d, int alpha, int beta, boolean search_extend) {
 		//ID-Test
 		countloop++;
@@ -456,7 +461,7 @@ public class board {
 		int score=-10000;
 		if ((b.gameOver() != '?') || (search_extend && (d < 0)) || (!search_extend && (d < 1)) || (!search_extend && (time_left < 0))) return b.getScore();
 		ArrayList<Move> ml = b.legalMoves();
-		
+		Collections.sort(ml);		
 		for (Move m : ml) {
 			board b2=new board(b.toString());
 			b2.move(m);
@@ -476,40 +481,62 @@ public class board {
 		return score;
 	}
 	
-
-
-	public void addToHistory(Move bestMove){
-		
-		
-		hist[bestMove.from.toInt()][bestMove.to.toInt()] += 1;
-
+	public void saveHistory(String filename) {
+		String print_out="";
+		File file = new File(filename);
+		try {
+			FileWriter writer = new FileWriter(file,false);			
+			for (int i=0; i<57; i++) {
+				for (int j=0; j<57; j++)
+					print_out+=hist[i][j]+",";
+				writer.write(print_out+System.getProperty("line.separator"));
+				print_out="";
+			}
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			e.getMessage();
+		}
 	}
 	
-	public int getHistory(Move bestMove){
-		return hist[bestMove.from.toInt()][bestMove.to.toInt()];
-
+	public void loadHistory(String filename){
+		String read_in="";
+		String[] read_in_c=null;
+		File file = new File(filename);
+		int j=0;
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			//for (int i=0; i<57; i++) {
+			read_in=reader.readLine();
+			while (read_in!=null) {
+				read_in_c=read_in.split(",");
+				for (int i=0; i<read_in_c.length; i++) {
+					hist[j][i]=Integer.parseInt(read_in_c[i]);
+				}
+				read_in=reader.readLine();
+				j++;
+			}
+			reader.close();
+		} catch (IOException e) {
+			e.getMessage();
+		}
 	}
-
 	
-	//main method - start of the programm
-
+//main method - start of the programm
 	public static void main(String[] args){
 
 		Move move_result;
 		
 		String id;
-		long $startmilli = 0;
-		long $time_black = 0;
-		long $time_white = 0;
+		long startmilli = 0;
+		long time_left_1 = 300000;
+		long time_left_2 = 300000;
 		int intervall=0;
-		long timeToFinish = 0;
 		char color='?';
 		
 		try{
-			Client myClient = new Client("imcs.svcs.cs.pdx.edu", "3589", "ai_megachess_8000_ger", "minichess2013");
-						
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-
+			Client myClient=null;
 			System.out.println("Choose one option:");
 			System.out.println("1 - Local game");
 			System.out.println("2 - Network game");
@@ -517,6 +544,7 @@ public class board {
 			int menu = Integer.parseInt(in.readLine());
 						
 			if (menu==2) {
+				myClient = new Client("imcs.svcs.cs.pdx.edu", "3589", "ai_megachess_8000_ger", "minichess2013");
 				System.out.println("1 - Create new game");
 				System.out.println("2 - Join game");
 				int offers = Integer.parseInt(in.readLine());
@@ -541,36 +569,36 @@ public class board {
 			}
 			
 			
-			board myBoard=new board("0 W ....." +
-					"k...." +
-					"....p" +
-					".p.r." +
-					"..Q.." +
-					"K....");
-			
+			board myBoard=new board();
+			myBoard.loadHistory("hist.txt");
 			myBoard.print();
-			System.out.println(color);
-			timeToFinish = System.currentTimeMillis()+300000;
-				do{
-					
-					$startmilli = System.currentTimeMillis();
+			System.out.println("You are: "+color);
+			do{	
+					startmilli = System.currentTimeMillis();
 					if (myBoard.onMove == color) {
-						intervall = (int)(timeToFinish-System.currentTimeMillis())/(40-Math.min(myBoard.moveNum,39))-1000;
-						move_result = myBoard.negamax_move_id(myBoard,intervall);								// negamax player with pruning and time management
-						if (menu==2) myClient.sendMove("! " + move_result.toString());										// needed for network play	
-						$time_black += (System.currentTimeMillis()-$startmilli);
+						intervall = Math.max(2000,(int)(time_left_1/41-myBoard.moveNum)-1500);
+						System.out.println("Zeit für Zug: "+intervall);
+						move_result = myBoard.negamax_move_id(myBoard,intervall);		// negamax player with pruning and time management
+						
+						if (menu==2) myClient.sendMove("! " + move_result.toString());	// needed for network play
+
+						time_left_1 -= System.currentTimeMillis()-startmilli;
 					} else {
-						intervall = (int)(timeToFinish-System.currentTimeMillis())/(40-myBoard.moveNum)-1000;	// needed for time management
-						//move_result= myBoard.half_dumb_random();												// greedy dumb player player
+						intervall = Math.max(2000,(int)(time_left_2/41-myBoard.moveNum)-1500);
+						
 						if (menu==2) move_result = new Move(myClient.getMove());
-						else move_result = myBoard.negamax_move_id(myBoard,intervall);								// negamax player with pruning and time management
-						$time_white+=(System.currentTimeMillis()-$startmilli);
+						else {
+							//move_result= myBoard.negamax_move(myBoard,10);
+							move_result = myBoard.negamax_move_id(myBoard,intervall);	// negamax player with pruning and time management
+						}
+						time_left_2 -= System.currentTimeMillis()-startmilli;
 					}
+					move_result.addToHistory();
 					myBoard.move(move_result);
-					System.out.println("Current Score: " + myBoard.getScore()+" Zeit für Zug: "+intervall+ " time left: "+(timeToFinish-System.currentTimeMillis()));
-					System.out.println("=============");
+					System.out.println("============================");
+					System.out.println("Score: " + myBoard.getScore()+" Time left you: "+(int)(time_left_1/1000)+ " Time left opponent: "+(int)(time_left_2/1000));
 					myBoard.print();
-					System.out.println();
+					System.out.println("============================");
 
 				} while(myBoard.gameOver() == '?');
 
@@ -578,14 +606,13 @@ public class board {
 				if (myBoard.gameOver()=='W') System.out.println("White wins");
 				if (myBoard.gameOver()=='R') System.out.println("Remis");
 
-				System.out.println("Black needs around "+($time_black/myBoard.moveNum)+" Millisconds per move");
-				System.out.println("White needs around "+($time_white/myBoard.moveNum)+" Millisconds per move");
+				if (menu==2) myClient.close();
 
-				myClient.close();
-			}
-			catch(IOException e){
-				System.out.println("!!! Connection problem");
-				e.getMessage();
-			}
+				myBoard.saveHistory("hist.txt");
+		}
+		catch(IOException e){
+			System.out.println("!!! Connection problem");
+			e.getMessage();
+		}
 	}
 }
