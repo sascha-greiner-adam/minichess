@@ -406,11 +406,12 @@ public class board {
 
 //method for moving using negamax-algorithm and a given depth
 	public Move negamax_move(board b, int d) {
-		Move m0=null;
+		//Move m0=null;
 		int v=-10000;
 		int v0 = 0;
 		int alpha=-10000;
 		board copy = new board(this.toString());
+		ArrayList<Move> bestMoves = copy.legalMoves();
 		ArrayList<Move> movelist = copy.legalMoves();
 		for (Move m : movelist) {
 			copy = new board(this.toString());
@@ -418,11 +419,13 @@ public class board {
 			v0 = Math.max(v,-negamax_prune(copy,d,-10000,-alpha,false));
 			alpha = Math.max(alpha, v0);
 			//map.put(m, v0);
-			if (v0 > v) m0 = m;
+			if (v0 >= v) bestMoves.add(m);
 			v = Math.max(v, v0);
 		}
 		//System.out.println(m0+" - "+v0+" Depth: "+d);
-		return m0;
+		
+		Collections.sort(bestMoves);
+		return bestMoves.get(0);
 	}
 
 //method for moving using negamax_move and iterative deepening
