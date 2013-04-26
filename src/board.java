@@ -71,6 +71,9 @@ public class board {
 				}
 			}
 		}
+		if (gameOver()=='B') scoreBlack += 10000;
+		if (gameOver()=='W') scoreWhite += 10000;
+		
 		if(onMove == 'B')
 			return scoreBlack - scoreWhite;
 		else
@@ -406,12 +409,11 @@ public class board {
 
 //method for moving using negamax-algorithm and a given depth
 	public Move negamax_move(board b, int d) {
-		//Move m0=null;
-		int v=-10000;
+		Move m0=null;
+		int v=-30000;
 		int v0 = 0;
 		int alpha=-10000;
 		board copy = new board(this.toString());
-		ArrayList<Move> bestMoves = copy.legalMoves();
 		ArrayList<Move> movelist = copy.legalMoves();
 		for (Move m : movelist) {
 			copy = new board(this.toString());
@@ -419,13 +421,11 @@ public class board {
 			v0 = Math.max(v,-negamax_prune(copy,d,-10000,-alpha,false));
 			alpha = Math.max(alpha, v0);
 			//map.put(m, v0);
-			if (v0 >= v) bestMoves.add(m);
+			if (v0 > v) m0 = m;
 			v = Math.max(v, v0);
 		}
-		//System.out.println(m0+" - "+v0+" Depth: "+d);
-		
-		Collections.sort(bestMoves);
-		return bestMoves.get(0);
+		System.out.println(m0+" - "+v0+" Depth: "+d);
+		return m0;
 	}
 
 //method for moving using negamax_move and iterative deepening
@@ -455,6 +455,7 @@ public class board {
 		//ID-Test
 		countloop++;
 		long now=0;
+		int bgameover=b.gameOver();
 		if (countloop % 10000 == 0) {
 			now = System.currentTimeMillis();
 			time_left = (int)(time-now);
@@ -462,22 +463,19 @@ public class board {
 		//ID-Test END
 		
 		int score=-10000;
-		if ((b.gameOver() != '?') || (search_extend && (d < 0)) || (!search_extend && (d < 1)) || (!search_extend && (time_left < 0))) return b.getScore();
+		if (time_left < 0 || d < 1)	return b.getScore();
+		if (bgameover == onMove) return 10000;
+		else if (bgameover == 'R') return 0;
+		else if (bgameover != '?') return -10000;
+		
 		ArrayList<Move> ml = b.legalMoves();
-		Collections.sort(ml);		
+		Collections.sort(ml);	// Sorting after best moves in history		
 		for (Move m : ml) {
 			board b2=new board(b.toString());
 			b2.move(m);
 			
-			
-			//System.out.println("Move: "+m+" Old score: "+b.getScore()+" new score: "+b2.getScore());
-//			if (-b2.getScore()>b.getScore()) {
-//				System.out.println("Search extended");
-//				score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha,true));
-//			} else 
 				score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha,false));
-			
-			//score = Math.max(score,-negamax_prune(b2,d-1,-beta,-alpha,false));
+
 			alpha = Math.max(alpha, score);
 			if (score >= beta) return score;
 		}
